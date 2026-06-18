@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web 能力展覽館</title>
+    <meta name="description" content="一座展示現代網頁互動、視覺與瀏覽器能力的高科技展覽館。">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="cursor-light" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="回到首頁">
+        <span class="brand-mark"></span>
+        <span>Web 能力展覽館</span>
+      </a>
+      <nav class="nav-links" aria-label="主要導覽">
+        <a href="#lab">展品</a>
+        <a href="#reactor">反應爐</a>
+        <a href="#curves">曲線</a>
+        <a href="#console">控制台</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-image" src="assets/hero-lab.png" alt="未來感數位展館背景">
+        <canvas id="starfield" class="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Interactive Web Technology Gallery</p>
+          <h1 id="hero-title">把瀏覽器變成<br>一座會呼吸<br>的科技展館</h1>
+          <p class="hero-copy">粒子、聲音、shader、視差、拖曳物理、<br>資料流與裝置感測都在同一個網站裡即時運作。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#lab">進入展館</a>
+            <button class="button ghost" id="toggle-motion" type="button">啟動動態模式</button>
+          </div>
+        </div>
+        <div class="hero-instruments" aria-label="即時狀態">
+          <div><span id="fps">60</span><small>FPS</small></div>
+          <div><span id="nodes">128</span><small>Particles</small></div>
+          <div><span id="tilt">0°</span><small>Tilt</small></div>
+        </div>
+      </section>
+
+      <section class="intro-band" aria-label="展示能力摘要">
+        <div class="metric"><b>01</b><span>WebGL shader 即時渲染</span></div>
+        <div class="metric"><b>02</b><span>Web Audio 頻譜視覺化</span></div>
+        <div class="metric"><b>03</b><span>Canvas 粒子與拖曳互動</span></div>
+        <div class="metric"><b>04</b><span>Scroll-driven 3D 視差</span></div>
+      </section>
+
+      <section id="lab" class="gallery" aria-labelledby="gallery-title">
+        <div class="section-heading">
+          <p class="eyebrow">Exhibits</p>
+          <h2 id="gallery-title">每一個展品都是一個瀏覽器能力</h2>
+        </div>
+
+        <article class="exhibit shader-exhibit">
+          <div class="exhibit-copy">
+            <span class="tag">GPU Look</span>
+            <h3>液態光譜 Shader</h3>
+            <p>使用 WebGL fragment shader 在你的顯卡上即時產生流動光場。滑鼠位置會改變波紋中心。</p>
+            <div class="control-row">
+              <label for="shader-speed">速度</label>
+              <input id="shader-speed" type="range" min="0.2" max="2.4" value="1.0" step="0.1">
+            </div>
+          </div>
+          <canvas id="shader-canvas" class="shader-canvas" aria-label="即時 WebGL shader 展示"></canvas>
+        </article>
+
+        <article class="exhibit audio-exhibit">
+          <div class="exhibit-copy">
+            <span class="tag">Web Audio</span>
+            <h3>聲音頻譜反應艙</h3>
+            <p>由瀏覽器產生合成音源，再用 AnalyzerNode 把頻譜變成會跳動的環形燈塔。</p>
+            <div class="button-row">
+              <button class="icon-button" id="audio-toggle" type="button" aria-label="播放或暫停聲音">▶</button>
+              <button class="button compact" id="random-tone" type="button">重組音色</button>
+            </div>
+          </div>
+          <canvas id="audio-canvas" class="audio-canvas" aria-label="音訊頻譜視覺化"></canvas>
+        </article>
+
+        <article class="exhibit physics-exhibit">
+          <div class="exhibit-copy">
+            <span class="tag">Pointer Physics</span>
+            <h3>拖曳式重力磁場</h3>
+            <p>展品裡的節點會互相牽引，拖曳任一節點可以改變整個系統的拓樸。</p>
+            <div class="button-row">
+              <button class="button compact" id="reset-physics" type="button">重置場域</button>
+            </div>
+          </div>
+          <canvas id="physics-canvas" class="physics-canvas" aria-label="可拖曳物理節點展示"></canvas>
+        </article>
+      </section>
+
+      <section id="reactor" class="reactor" aria-labelledby="reactor-title">
+        <div class="section-heading">
+          <p class="eyebrow">Scroll Reactor</p>
+          <h2 id="reactor-title">捲動會推動整座介面進入不同相位</h2>
+        </div>
+        <div class="reactor-grid">
+          <div class="orbital-stage" aria-hidden="true">
+            <div class="reactor-viewport">
+              <canvas id="reactor-3d-canvas" class="reactor-3d-canvas" aria-hidden="true"></canvas>
+              <div class="energy-core">
+                <span class="core-shell"></span>
+                <span class="core-facet facet-a"></span>
+                <span class="core-facet facet-b"></span>
+                <span class="core-facet facet-c"></span>
+                <span class="core-spark spark-a"></span>
+                <span class="core-spark spark-b"></span>
+                <span class="core-spark spark-c"></span>
+              </div>
+              <span class="ring ring-a"></span>
+              <span class="ring ring-b"></span>
+              <span class="ring ring-c"></span>
+              <span class="ring ring-d"></span>
+              <span class="reactor-beam beam-a"></span>
+              <span class="reactor-beam beam-b"></span>
+              <span class="reactor-beam beam-c"></span>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <b>感測</b>
+              <span>Pointer、scroll、keyboard 與裝置方向都能變成介面輸入。</span>
+            </div>
+            <div class="timeline-item">
+              <b>合成</b>
+              <span>Canvas、CSS 3D、filter、mask 與 blend mode 疊成單一場景。</span>
+            </div>
+            <div class="timeline-item">
+              <b>回饋</b>
+              <span>動畫不只好看，也能揭露狀態、節奏、資料密度與操作結果。</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="curves" class="curve-lab" aria-labelledby="curve-title">
+        <div class="section-heading curve-heading">
+          <div>
+            <p class="eyebrow">Math Curve Loaders</p>
+            <h2 id="curve-title">把數學曲線變成有生命的載入動畫</h2>
+            <a class="source-link" href="https://paidax01.github.io/math-curve-loaders/" target="_blank" rel="noreferrer">Source inspiration</a>
+          </div>
+        </div>
+        <div class="curve-lab-grid">
+          <div class="curve-stage">
+            <canvas id="curve-main" class="curve-main" aria-label="數學曲線載入動畫主展示"></canvas>
+            <div class="curve-readout">
+              <b id="curve-name">Rose Orbit</b>
+              <code id="curve-formula">r = a cos(kθ)</code>
+            </div>
+          </div>
+          <div class="curve-controls">
+            <div class="control-row">
+              <label for="curve-speed">速度</label>
+              <input id="curve-speed" type="range" min="0.35" max="2.4" value="1" step="0.05">
+            </div>
+            <div class="control-row">
+              <label for="curve-particles">粒子</label>
+              <input id="curve-particles" type="range" min="28" max="140" value="84" step="1">
+            </div>
+            <div class="control-row">
+              <label for="curve-trail">長度</label>
+              <input id="curve-trail" type="range" min="0.12" max="0.68" value="0.32" step="0.01">
+            </div>
+          </div>
+        </div>
+        <div class="curve-cards" aria-label="曲線載入器選擇">
+          <button class="curve-card is-active" type="button" data-curve="rose">
+            <canvas aria-hidden="true"></canvas>
+            <span>Rose Orbit</span>
+          </button>
+          <button class="curve-card" type="button" data-curve="lissajous">
+            <canvas aria-hidden="true"></canvas>
+            <span>Lissajous Drift</span>
+          </button>
+          <button class="curve-card" type="button" data-curve="hypotrochoid">
+            <canvas aria-hidden="true"></canvas>
+            <span>Hypotrochoid</span>
+          </button>
+          <button class="curve-card" type="button" data-curve="cardioid">
+            <canvas aria-hidden="true"></canvas>
+            <span>Cardioid Pulse</span>
+          </button>
+          <button class="curve-card" type="button" data-curve="cassini">
+            <canvas aria-hidden="true"></canvas>
+            <span>Cassini Oval</span>
+          </button>
+          <button class="curve-card" type="button" data-curve="fourier">
+            <canvas aria-hidden="true"></canvas>
+            <span>Fourier Ribbon</span>
+          </button>
+        </div>
+      </section>
+
+      <section id="console" class="console-section" aria-labelledby="console-title">
+        <div class="section-heading">
+          <p class="eyebrow">Browser Console</p>
+          <h2 id="console-title">把瀏覽器 API 變成可玩的控制面板</h2>
+        </div>
+        <div class="console-grid">
+          <div class="glass-panel">
+            <h3>資料流儀表板</h3>
+            <canvas id="data-canvas" class="data-canvas" aria-label="即時資料流圖表"></canvas>
+          </div>
+          <div class="glass-panel api-panel">
+            <h3>能力開關</h3>
+            <button class="button full" id="copy-report" type="button">複製展館狀態</button>
+            <button class="button full" id="speak-title" type="button">朗讀展館標題</button>
+            <button class="button full" id="fullscreen" type="button">沉浸全螢幕</button>
+            <output id="api-output">Ready.</output>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Built as a living web-tech gallery.</span>
+      <a href="#top">回到頂端</a>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

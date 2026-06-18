@@ -1,0 +1,7 @@
+# Visual QA artifacts
+*-screenshot.png
+
+# Local tooling
+.DS_Store
+Thumbs.db
+
