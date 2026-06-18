@@ -425,9 +425,19 @@ function setupMathCurves() {
   const speedInput = document.querySelector("#curve-speed");
   const particleInput = document.querySelector("#curve-particles");
   const trailInput = document.querySelector("#curve-trail");
+  const controlsPanel = document.querySelector(".curve-controls");
+  const specificControls = document.querySelector("#curve-specific-controls");
+  const paramGrid = document.querySelector("#curve-param-grid");
+  const paramReset = document.querySelector("#curve-params-reset");
   const cards = [...document.querySelectorAll(".curve-card")];
-  const visibility = createVisibilityTracker(document.querySelector("#curves"));
+  const cardsContainer = document.querySelector(".curve-cards");
+  const prevButton = document.querySelector("#curve-prev");
+  const nextButton = document.querySelector("#curve-next");
+  const pageStatus = document.querySelector("#curve-page-status");
+  const visibility = createVisibilityTracker(document.querySelector("#curves"), "40px");
   let activeKey = "rose";
+  let currentPage = 0;
+  let lastMiniDraw = 0;
 
   const curves = {
     rose: {
@@ -501,8 +511,233 @@ function setupMathCurves() {
         }
         return [x * 0.26, y * 0.26];
       }
+    },
+    thinking7: {
+      name: "Original Thinking",
+      formula: "x = R cos(t) - a cos(7t), y = R sin(t) - a sin(7t)",
+      colorA: [109, 255, 180],
+      colorB: [255, 111, 125],
+      point(t, pulse) {
+        const detail = 0.15 + pulse * 0.035;
+        return [0.42 * Math.cos(t) - detail * Math.cos(7 * t), 0.42 * Math.sin(t) - detail * Math.sin(7 * t)];
+      }
+    },
+    thinking5: {
+      name: "Thinking Five",
+      formula: "x = R cos(t) - a cos(5t), y = R sin(t) - a sin(5t)",
+      colorA: [56, 232, 255],
+      colorB: [109, 255, 180],
+      point(t, pulse) {
+        const detail = 0.17 + pulse * 0.03;
+        return [0.4 * Math.cos(t) - detail * Math.cos(5 * t), 0.4 * Math.sin(t) - detail * Math.sin(5 * t)];
+      }
+    },
+    thinking9: {
+      name: "Thinking Nine",
+      formula: "x = R cos(t) - a cos(9t), y = R sin(t) - a sin(9t)",
+      colorA: [255, 209, 102],
+      colorB: [56, 232, 255],
+      point(t, pulse) {
+        const detail = 0.13 + pulse * 0.035;
+        return [0.43 * Math.cos(t) - detail * Math.cos(9 * t), 0.43 * Math.sin(t) - detail * Math.sin(9 * t)];
+      }
+    },
+    roseCurve: {
+      name: "Rose Curve",
+      formula: "r = a sin(7t)",
+      colorA: [255, 111, 125],
+      colorB: [255, 209, 102],
+      point(t, pulse) {
+        const r = (0.48 + pulse * 0.05) * Math.sin(7 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    rose2: {
+      name: "Rose Two",
+      formula: "r = a cos(2t)",
+      colorA: [109, 255, 180],
+      colorB: [56, 232, 255],
+      point(t, pulse) {
+        const r = (0.5 + pulse * 0.045) * Math.cos(2 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    rose3: {
+      name: "Rose Three",
+      formula: "r = a cos(3t)",
+      colorA: [56, 232, 255],
+      colorB: [255, 111, 125],
+      point(t, pulse) {
+        const r = (0.5 + pulse * 0.045) * Math.cos(3 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    rose4: {
+      name: "Rose Four",
+      formula: "r = a cos(4t)",
+      colorA: [255, 209, 102],
+      colorB: [109, 255, 180],
+      point(t, pulse) {
+        const r = (0.48 + pulse * 0.05) * Math.cos(4 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    lemniscate: {
+      name: "Lemniscate Bloom",
+      formula: "x = a cos(t)/(1 + sin²t), y = a sin(t)cos(t)/(1 + sin²t)",
+      colorA: [255, 111, 125],
+      colorB: [56, 232, 255],
+      point(t, pulse) {
+        const denominator = 1 + Math.sin(t) ** 2;
+        const a = 0.62 + pulse * 0.05;
+        return [a * Math.cos(t) / denominator, a * Math.sin(t) * Math.cos(t) / denominator];
+      }
+    },
+    spiral3: {
+      name: "Three-Petal Spiral",
+      formula: "r = a + b cos(3t)",
+      colorA: [109, 255, 180],
+      colorB: [255, 209, 102],
+      point(t, pulse) {
+        const r = 0.3 + (0.2 + pulse * 0.035) * Math.cos(3 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    spiral4: {
+      name: "Four-Petal Spiral",
+      formula: "r = a + b cos(4t)",
+      colorA: [56, 232, 255],
+      colorB: [255, 209, 102],
+      point(t, pulse) {
+        const r = 0.3 + (0.2 + pulse * 0.035) * Math.cos(4 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    spiral5: {
+      name: "Five-Petal Spiral",
+      formula: "r = a + b cos(5t)",
+      colorA: [255, 111, 125],
+      colorB: [109, 255, 180],
+      point(t, pulse) {
+        const r = 0.3 + (0.2 + pulse * 0.035) * Math.cos(5 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    spiral6: {
+      name: "Six-Petal Spiral",
+      formula: "r = a + b cos(6t)",
+      colorA: [255, 209, 102],
+      colorB: [255, 111, 125],
+      point(t, pulse) {
+        const r = 0.3 + (0.2 + pulse * 0.035) * Math.cos(6 * t);
+        return [r * Math.cos(t), r * Math.sin(t)];
+      }
+    },
+    butterfly: {
+      name: "Butterfly Phase",
+      formula: "x = sin(t)B(t), y = cos(t)B(t)",
+      colorA: [109, 255, 180],
+      colorB: [255, 111, 125],
+      point(t, pulse) {
+        const angle = t * 4;
+        const wing = Math.exp(Math.cos(angle)) - 2 * Math.cos(4 * angle) - Math.sin(angle / 12) ** 5;
+        const scale = 0.115 + pulse * 0.006;
+        return [Math.sin(angle) * wing * scale, Math.cos(angle) * wing * scale];
+      }
+    },
+    cardioidHeart: {
+      name: "Cardioid Heart",
+      formula: "x = a sin³(t), y = b cos(t) - c cos(2t) - d cos(3t)",
+      colorA: [255, 111, 125],
+      colorB: [255, 209, 102],
+      point(t, pulse) {
+        const breathe = 0.9 + pulse * 0.1;
+        return [0.5 * Math.sin(t) ** 3 * breathe, (0.38 * Math.cos(t) - 0.15 * Math.cos(2 * t) - 0.07 * Math.cos(3 * t)) * breathe];
+      }
+    },
+    heartWave: {
+      name: "Heart Wave",
+      colorA: [255, 255, 255],
+      colorB: [132, 140, 152],
+      rotate: false,
+      pathWeight: 1.35,
+      params: {
+        stroke: 6,
+        b: 12,
+        root: 2.2,
+        waveAmp: 0.9,
+        scaleX: 14,
+        scaleY: 14
+      },
+      controls: [
+        { key: "stroke", label: "Stroke", min: 1.5, max: 6, step: 0.1 },
+        { key: "b", label: "b", min: 2, max: 12, step: 0.1 },
+        { key: "root", label: "Root span", min: 2.2, max: 4.2, step: 0.05 },
+        { key: "waveAmp", label: "Wave amp", min: 0.3, max: 1.6, step: 0.05 },
+        { key: "scaleX", label: "X scale", min: 14, max: 30, step: 0.1 },
+        { key: "scaleY", label: "Y scale", min: 14, max: 34, step: 0.1 }
+      ],
+      formula(params) {
+        return `f(x) = |x|^(2/3) + ${params.waveAmp.toFixed(2)}√(${params.root.toFixed(2)} - x²) sin(${params.b.toFixed(1)}πx)`;
+      },
+      point(t, pulse) {
+        const progress = t / (Math.PI * 2);
+        const xLimit = Math.sqrt(this.params.root);
+        const x = -xLimit + progress * xLimit * 2;
+        const safeRoot = Math.max(0, this.params.root - x * x);
+        const wave = this.params.waveAmp * Math.sqrt(safeRoot) * Math.sin(this.params.b * Math.PI * x);
+        const y = Math.pow(Math.abs(x), 2 / 3) + wave;
+        const screenX = 50 + x * this.params.scaleX;
+        const screenY = 18 + (1.75 - y) * (this.params.scaleY + pulse * 1.5);
+        return [(screenX - 50) / 50, (screenY - 50) / 50];
+      }
+    },
+    spiralSearch: {
+      name: "Spiral Search",
+      formula: "θ(t) = 4t, r(t) = 8 + (1 - cos t)(8.5 + 2.4s)",
+      colorA: [255, 255, 255],
+      colorB: [154, 164, 178],
+      rotate: false,
+      point(t, pulse) {
+        const angle = t * 4;
+        const radius = (8 + (1 - Math.cos(t)) * (8.5 + pulse * 2.4)) / 50;
+        return [Math.cos(angle) * radius, Math.sin(angle) * radius];
+      }
+    },
+    epitrochoid: {
+      name: "Epitrochoid Star",
+      formula: "x = (R+r)cos(t) - d cos((R+r)t/r)",
+      colorA: [109, 255, 180],
+      colorB: [56, 232, 255],
+      point(t, pulse) {
+        const R = 0.28;
+        const r = 0.09;
+        const d = 0.2 + pulse * 0.035;
+        return [(R + r) * Math.cos(t) - d * Math.cos(((R + r) / r) * t), (R + r) * Math.sin(t) - d * Math.sin(((R + r) / r) * t)];
+      }
+    },
+    deltoid: {
+      name: "Deltoid Trace",
+      formula: "x = 2a cos(t) + a cos(2t), y = 2a sin(t) - a sin(2t)",
+      colorA: [255, 111, 125],
+      colorB: [109, 255, 180],
+      point(t, pulse) {
+        const a = 0.18 + pulse * 0.015;
+        return [2 * a * Math.cos(t) + a * Math.cos(2 * t), 2 * a * Math.sin(t) - a * Math.sin(2 * t)];
+      }
     }
   };
+
+  const curvePages = [
+    ["rose", "lissajous", "hypotrochoid", "cardioid", "cassini", "fourier"],
+    ["thinking7", "thinking5", "thinking9", "roseCurve", "rose2", "rose3"],
+    ["rose4", "lemniscate", "spiral3", "spiral4", "spiral5", "spiral6"],
+    ["butterfly", "cardioidHeart", "heartWave", "spiralSearch", "epitrochoid", "deltoid"]
+  ];
+
+  Object.values(curves).forEach((curve) => {
+    if (curve.params) curve.defaultParams = { ...curve.params };
+  });
 
   function mixColor(a, b, t, alpha = 1) {
     const r = Math.round(lerp(a[0], b[0], t));
@@ -512,7 +747,7 @@ function setupMathCurves() {
   }
 
   function drawCurve(canvas, ctx, curve, now, options = {}) {
-    const { width, height } = fitCanvas(canvas);
+    const { width, height, scale: canvasScale } = fitCanvas(canvas, options.pixelScale ?? Math.min(renderScale, 0.65));
     const size = Math.min(width, height);
     const cx = width / 2;
     const cy = height / 2;
@@ -527,7 +762,8 @@ function setupMathCurves() {
     ctx.clearRect(0, 0, width, height);
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(options.rotate === false ? 0 : time * 0.16);
+    const shouldRotate = options.rotate ?? curve.rotate ?? true;
+    ctx.rotate(shouldRotate ? time * 0.16 : 0);
 
     const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.42);
     gradient.addColorStop(0, mixColor(curve.colorA, curve.colorB, 0.35, 0.22));
@@ -540,7 +776,7 @@ function setupMathCurves() {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.beginPath();
-    const steps = options.steps ?? 520;
+    const steps = options.steps ?? 220;
     for (let i = 0; i <= steps; i++) {
       const t = (i / steps) * Math.PI * 2;
       const [x, y] = curve.point(t, pulse);
@@ -550,7 +786,11 @@ function setupMathCurves() {
       else ctx.lineTo(px, py);
     }
     ctx.strokeStyle = mixColor(curve.colorA, curve.colorB, 0.4, options.pathAlpha ?? 0.22);
-    ctx.lineWidth = Math.max(1, size * (options.lineWidth ?? 0.006));
+    const stroke = options.stroke ?? curve.params?.stroke;
+    const particleScale = stroke ? clamp(stroke / 3.9, 0.6, 1.55) : 1;
+    ctx.lineWidth = stroke
+      ? stroke * canvasScale * (curve.pathWeight ?? 1)
+      : Math.max(1, size * (options.lineWidth ?? 0.006));
     ctx.stroke();
 
     for (let i = particleCount - 1; i >= 0; i--) {
@@ -559,14 +799,34 @@ function setupMathCurves() {
       const [x, y] = curve.point(t, pulse);
       const fade = Math.pow(1 - tail, 0.9);
       ctx.fillStyle = mixColor(curve.colorA, curve.colorB, tail, 0.08 + fade * 0.86);
-      ctx.shadowColor = mixColor(curve.colorA, curve.colorB, tail, 0.75);
-      ctx.shadowBlur = size * 0.045 * fade;
       ctx.beginPath();
-      ctx.arc(x * scale, y * scale, size * (0.004 + fade * 0.014), 0, Math.PI * 2);
+      ctx.arc(x * scale, y * scale, size * (0.004 + fade * 0.014) * particleScale, 0, Math.PI * 2);
       ctx.fill();
     }
+
+    if (options.glow !== false) {
+      const headT = progress * Math.PI * 2;
+      const [headX, headY] = curve.point(headT, pulse);
+      const glowRadius = size * 0.09 * particleScale;
+      const glow = ctx.createRadialGradient(
+        headX * scale,
+        headY * scale,
+        0,
+        headX * scale,
+        headY * scale,
+        glowRadius
+      );
+      glow.addColorStop(0, mixColor(curve.colorA, curve.colorB, 0.08, 0.72));
+      glow.addColorStop(0.35, mixColor(curve.colorA, curve.colorB, 0.24, 0.26));
+      glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.globalCompositeOperation = "screen";
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(headX * scale, headY * scale, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = "source-over";
+    }
     ctx.restore();
-    ctx.shadowBlur = 0;
   }
 
   const miniInstances = cards.map((card, index) => ({
@@ -574,14 +834,86 @@ function setupMathCurves() {
     key: card.dataset.curve,
     canvas: card.querySelector("canvas"),
     ctx: card.querySelector("canvas").getContext("2d"),
-    offset: index * 1.7
+    offset: index * 1.7,
+    drawn: false
   }));
+
+  function getFormula(curve) {
+    return typeof curve.formula === "function" ? curve.formula(curve.params) : curve.formula;
+  }
+
+  function formatParamValue(value, step) {
+    return Number(value).toFixed(Number(step) < 1 ? 2 : 0);
+  }
+
+  function renderSpecificControls(curve) {
+    const hasControls = Boolean(curve.controls?.length);
+    specificControls.hidden = !hasControls;
+    controlsPanel.classList.toggle("has-specific-controls", hasControls);
+    paramGrid.replaceChildren();
+    if (!hasControls) return;
+
+    curve.controls.forEach((control) => {
+      const wrapper = document.createElement("div");
+      const head = document.createElement("div");
+      const label = document.createElement("label");
+      const output = document.createElement("output");
+      const input = document.createElement("input");
+      const inputId = `curve-param-${control.key}`;
+
+      wrapper.className = "curve-param";
+      head.className = "curve-param-head";
+      label.htmlFor = inputId;
+      label.textContent = control.label;
+      output.setAttribute("for", inputId);
+      output.value = formatParamValue(curve.params[control.key], control.step);
+      input.id = inputId;
+      input.type = "range";
+      input.min = String(control.min);
+      input.max = String(control.max);
+      input.step = String(control.step);
+      input.value = String(curve.params[control.key]);
+
+      input.addEventListener("input", () => {
+        curve.params[control.key] = Number(input.value);
+        output.value = formatParamValue(input.value, control.step);
+        if (curves[activeKey] === curve) curveFormula.textContent = getFormula(curve);
+      });
+
+      head.append(label, output);
+      wrapper.append(head, input);
+      paramGrid.append(wrapper);
+    });
+  }
+
+  function renderCurvePage(pageIndex) {
+    currentPage = (pageIndex + curvePages.length) % curvePages.length;
+    const pageKeys = curvePages[currentPage];
+
+    miniInstances.forEach((item, index) => {
+      const key = pageKeys[index];
+      item.key = key;
+      item.drawn = false;
+      item.card.dataset.curve = key;
+      item.card.setAttribute("aria-label", curves[key].name);
+      item.card.querySelector("span").textContent = curves[key].name;
+      item.ctx.clearRect(0, 0, item.canvas.width, item.canvas.height);
+    });
+
+    pageStatus.textContent = `${String(currentPage + 1).padStart(2, "0")} / ${String(curvePages.length).padStart(2, "0")}`;
+    cardsContainer.classList.remove("is-page-changing");
+    void cardsContainer.offsetWidth;
+    cardsContainer.classList.add("is-page-changing");
+    window.setTimeout(() => cardsContainer.classList.remove("is-page-changing"), 450);
+    selectCurve(pageKeys[0]);
+  }
 
   function selectCurve(key) {
     activeKey = key;
     const curve = curves[key];
     curveName.textContent = curve.name;
-    curveFormula.textContent = curve.formula;
+    curveFormula.textContent = getFormula(curve);
+    renderSpecificControls(curve);
     cards.forEach((card) => card.classList.toggle("is-active", card.dataset.curve === key));
   }
 
@@ -589,26 +921,47 @@ function setupMathCurves() {
     card.addEventListener("click", () => selectCurve(card.dataset.curve));
   });
 
+  prevButton.addEventListener("click", () => renderCurvePage(currentPage - 1));
+  nextButton.addEventListener("click", () => renderCurvePage(currentPage + 1));
+  paramReset.addEventListener("click", () => {
+    const curve = curves[activeKey];
+    if (!curve.defaultParams) return;
+    curve.params = { ...curve.defaultParams };
+    curveFormula.textContent = getFormula(curve);
+    renderSpecificControls(curve);
+  });
+
   function draw(now) {
     if (visibility.visible && !document.hidden) {
       drawCurve(mainCanvas, mainCtx, curves[activeKey], now, { scale: 0.52, lineWidth: 0.0048 });
-      miniInstances.forEach((item, index) => {
-        if (index % 2 === Math.floor(now / 500) % 2) {
+      if (now - lastMiniDraw >= 1000 / 20) {
+        lastMiniDraw = now;
+        miniInstances.forEach((item) => {
+          if (item.drawn && item.key !== activeKey) return;
           drawCurve(item.canvas, item.ctx, curves[item.key], now, {
-            particles: 30,
+            particles: 18,
             scale: 0.54,
             lineWidth: 0.008,
             pathAlpha: item.key === activeKey ? 0.34 : 0.18,
             offset: item.offset,
-            trail: 0.3
+            trail: 0.3,
+            steps: 120,
+            pixelScale: 1,
+            glow: item.key === activeKey
           });
-        }
-      });
+          item.drawn = true;
+        });
+      }
     }
     requestAnimationFrame(draw);
   }
 
-  selectCurve(activeKey);
+  const requestedCurve = new URLSearchParams(window.location.search).get("curve");
+  const requestedPage = requestedCurve
+    ? curvePages.findIndex((page) => page.includes(requestedCurve))
+    : -1;
+  renderCurvePage(requestedPage >= 0 ? requestedPage : 0);
+  if (requestedCurve && curves[requestedCurve]) selectCurve(requestedCurve);
   requestAnimationFrame(draw);
 }
 

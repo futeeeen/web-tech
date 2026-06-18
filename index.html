@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Web 能力展覽館</title>
     <meta name="description" content="一座展示現代網頁互動、視覺與瀏覽器能力的高科技展覽館。">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260618-curve-gallery-2">
   </head>
   <body>
     <div class="cursor-light" aria-hidden="true"></div>
@@ -162,40 +162,52 @@
             </div>
             <div class="control-row">
               <label for="curve-particles">粒子</label>
-              <input id="curve-particles" type="range" min="28" max="140" value="84" step="1">
+              <input id="curve-particles" type="range" min="24" max="100" value="64" step="1">
             </div>
             <div class="control-row">
               <label for="curve-trail">長度</label>
               <input id="curve-trail" type="range" min="0.12" max="0.68" value="0.32" step="0.01">
             </div>
+            <div class="curve-specific-controls" id="curve-specific-controls" hidden>
+              <div class="curve-specific-heading">
+                <span>Curve parameters</span>
+                <button id="curve-params-reset" class="curve-reset-button" type="button" aria-label="重設曲線專屬參數" title="重設曲線專屬參數">↺</button>
+              </div>
+              <div class="curve-param-grid" id="curve-param-grid"></div>
+            </div>
           </div>
         </div>
-        <div class="curve-cards" aria-label="曲線載入器選擇">
-          <button class="curve-card is-active" type="button" data-curve="rose">
-            <canvas aria-hidden="true"></canvas>
-            <span>Rose Orbit</span>
-          </button>
-          <button class="curve-card" type="button" data-curve="lissajous">
-            <canvas aria-hidden="true"></canvas>
-            <span>Lissajous Drift</span>
-          </button>
-          <button class="curve-card" type="button" data-curve="hypotrochoid">
-            <canvas aria-hidden="true"></canvas>
-            <span>Hypotrochoid</span>
-          </button>
-          <button class="curve-card" type="button" data-curve="cardioid">
-            <canvas aria-hidden="true"></canvas>
-            <span>Cardioid Pulse</span>
-          </button>
-          <button class="curve-card" type="button" data-curve="cassini">
-            <canvas aria-hidden="true"></canvas>
-            <span>Cassini Oval</span>
-          </button>
-          <button class="curve-card" type="button" data-curve="fourier">
-            <canvas aria-hidden="true"></canvas>
-            <span>Fourier Ribbon</span>
-          </button>
+        <div class="curve-gallery">
+          <button class="curve-page-button" id="curve-prev" type="button" aria-label="上一頁曲線" title="上一頁">←</button>
+          <div class="curve-cards" aria-label="曲線載入器選擇">
+            <button class="curve-card is-active" type="button" data-curve="rose">
+              <canvas aria-hidden="true"></canvas>
+              <span>Rose Orbit</span>
+            </button>
+            <button class="curve-card" type="button" data-curve="lissajous">
+              <canvas aria-hidden="true"></canvas>
+              <span>Lissajous Drift</span>
+            </button>
+            <button class="curve-card" type="button" data-curve="hypotrochoid">
+              <canvas aria-hidden="true"></canvas>
+              <span>Hypotrochoid</span>
+            </button>
+            <button class="curve-card" type="button" data-curve="cardioid">
+              <canvas aria-hidden="true"></canvas>
+              <span>Cardioid Pulse</span>
+            </button>
+            <button class="curve-card" type="button" data-curve="cassini">
+              <canvas aria-hidden="true"></canvas>
+              <span>Cassini Oval</span>
+            </button>
+            <button class="curve-card" type="button" data-curve="fourier">
+              <canvas aria-hidden="true"></canvas>
+              <span>Fourier Ribbon</span>
+            </button>
+          </div>
+          <button class="curve-page-button" id="curve-next" type="button" aria-label="下一頁曲線" title="下一頁">→</button>
         </div>
+        <div class="curve-page-status" id="curve-page-status" aria-live="polite">01 / 04</div>
       </section>
 
       <section id="console" class="console-section" aria-labelledby="console-title">
@@ -224,6 +236,6 @@
       <a href="#top">回到頂端</a>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=20260618-heart-wave-preset"></script>
   </body>
 </html>

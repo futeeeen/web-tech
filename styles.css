@@ -878,6 +878,88 @@ input[type="range"] {
   padding: 1.2rem;
 }
 
+.curve-controls.has-specific-controls {
+  justify-content: flex-start;
+}
+
+.curve-specific-controls {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.35rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.curve-specific-controls[hidden] {
+  display: none;
+}
+
+.curve-specific-heading,
+.curve-param-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.curve-specific-heading > span {
+  color: var(--cyan);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.curve-reset-button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  place-items: center;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.curve-reset-button:hover {
+  color: var(--ink);
+  border-color: var(--cyan);
+}
+
+.curve-param-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.curve-param {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.curve-param label,
+.curve-param output {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.curve-param output {
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.curve-param input {
+  width: 100%;
+  min-width: 0;
+}
+
 .source-link {
   display: inline-flex;
   align-items: center;
@@ -896,6 +978,69 @@ input[type="range"] {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 1rem;
+}
+
+.curve-gallery {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.curve-page-button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  place-items: center;
+  color: var(--cyan);
+  border: 1px solid rgba(56, 232, 255, 0.34);
+  border-radius: 50%;
+  background: rgba(8, 14, 26, 0.82);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.curve-page-button:hover {
+  color: #07101d;
+  border-color: var(--cyan);
+  background: var(--cyan);
+  transform: scale(1.06);
+}
+
+.curve-page-button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.curve-page-status {
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.curve-cards.is-page-changing .curve-card {
+  animation: curve-card-enter 260ms ease-out both;
+}
+
+.curve-cards.is-page-changing .curve-card:nth-child(2) { animation-delay: 25ms; }
+.curve-cards.is-page-changing .curve-card:nth-child(3) { animation-delay: 50ms; }
+.curve-cards.is-page-changing .curve-card:nth-child(4) { animation-delay: 75ms; }
+.curve-cards.is-page-changing .curve-card:nth-child(5) { animation-delay: 100ms; }
+.curve-cards.is-page-changing .curve-card:nth-child(6) { animation-delay: 125ms; }
+
+@keyframes curve-card-enter {
+  from {
+    opacity: 0;
+    transform: translateX(0.8rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .curve-card {
@@ -1041,6 +1186,25 @@ output {
 
   .curve-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .curve-gallery {
+    grid-template-columns: 1fr 2.75rem 2.75rem 1fr;
+  }
+
+  .curve-cards {
+    grid-row: 1;
+    grid-column: 1 / -1;
+  }
+
+  #curve-prev {
+    grid-row: 2;
+    grid-column: 2;
+  }
+
+  #curve-next {
+    grid-row: 2;
+    grid-column: 3;
   }
 
   .orbital-stage {
