@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#78c4bf">
+  <title>Signal Planet | 3D 訊息星球</title>
+  <link rel="stylesheet" href="styles.css?v=20260618-2">
+</head>
+<body>
+  <canvas id="world" aria-label="可互動旋轉的 3D 訊息星球"></canvas>
+
+  <header class="topbar">
+    <a class="back-link" href="../" aria-label="返回 Web 能力展覽館">← <span>WEB LAB</span></a>
+    <div class="brand" aria-label="Signal Planet">
+      <span class="brand-mark"></span>
+      <span>SIGNAL PLANET</span>
+    </div>
+    <div class="telemetry" aria-label="3D 場景狀態">
+      <span><b id="fps">60</b> FPS</span>
+      <span><b id="signal-count">06</b> SIGNALS</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" id="intro" aria-labelledby="intro-title">
+      <p>INTERPLANETARY MESSAGE SYSTEM</p>
+      <h1 id="intro-title"><span>SIGNAL</span><span>PLANET</span></h1>
+      <div class="intro-orbit" aria-hidden="true"></div>
+      <button class="enter-button" id="enter-world" type="button">
+        <span>ENTER WORLD</span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+
+    <section class="hud" id="hud" aria-label="訊息星球控制台">
+      <aside class="signal-panel" aria-labelledby="signal-heading">
+        <div class="panel-heading">
+          <span id="signal-heading">ACTIVE SIGNALS</span>
+          <b>ORBIT 04</b>
+        </div>
+        <div class="signal-list" id="signal-list"></div>
+      </aside>
+
+      <article class="message-panel" id="message-panel" aria-live="polite">
+        <div class="message-meta">
+          <span id="message-channel">FOREST NODE</span>
+          <time id="message-time">NOW</time>
+        </div>
+        <blockquote id="message-copy">有些訊息不需要目的地，只需要一條願意繞行的軌道。</blockquote>
+        <div class="message-author">
+          <span id="message-avatar">A</span>
+          <div>
+            <b id="message-name">ASTER</b>
+            <small id="message-location">NORTH CANOPY</small>
+          </div>
+        </div>
+      </article>
+
+      <div class="scene-tools" aria-label="場景工具">
+        <button id="sound-toggle" type="button" aria-label="切換聲音" title="切換聲音">♪</button>
+        <button id="reset-view" type="button" aria-label="重設視角" title="重設視角">↺</button>
+      </div>
+
+      <form class="composer" id="composer">
+        <label for="message-input">NEW TRANSMISSION</label>
+        <div class="composer-row">
+          <input id="message-input" name="message" maxlength="72" autocomplete="off" placeholder="輸入一段訊息..." required>
+          <button type="submit" aria-label="發射訊息" title="發射訊息">↑</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <output class="toast" id="toast" aria-live="polite"></output>
+  <div class="loading" id="loading" aria-live="polite">
+    <span></span>
+    <b>ASSEMBLING WORLD</b>
+  </div>
+
+  <script type="module" src="app.js?v=20260618-6"></script>
+</body>
+</html>
