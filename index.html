@@ -19,6 +19,7 @@
         <a href="#reactor">反應爐</a>
         <a href="#curves">曲線</a>
         <a href="messenger/">3D 星球</a>
+        <a href="hyperframes/">數據動畫</a>
         <a href="#console">控制台</a>
       </nav>
     </header>
@@ -94,6 +95,21 @@
             </div>
           </div>
           <canvas id="physics-canvas" class="physics-canvas" aria-label="可拖曳物理節點展示"></canvas>
+        </article>
+
+        <article class="exhibit video-exhibit">
+          <div class="exhibit-copy">
+            <span class="tag">HTML Video Engine</span>
+            <h3>HyperFrames 數據影片</h3>
+            <p>將影片視為網頁代碼（Video as Code）。利用 GSAP 驅動多維度圖表相位與變量轉換，並支援時間軸逐影格精準拖拽預覽。</p>
+            <div class="button-row">
+              <a class="button compact" href="hyperframes/">進入引擎艙</a>
+            </div>
+          </div>
+          <div class="video-preview-canvas" style="background: radial-gradient(circle at center, rgba(56, 232, 255, 0.1) 0%, transparent 70%); display: grid; place-items: center; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; min-height: 200px; width: 100%;">
+            <div class="preview-glow-ring" style="width: 100px; height: 100px; border-radius: 50%; border: 2px dashed rgba(56, 232, 255, 0.3); animation: rotateMark 15s linear infinite; position: absolute;"></div>
+            <a href="hyperframes/" style="position: absolute; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; letter-spacing: 2px; color: var(--cyan); text-shadow: 0 0 10px rgba(56, 232, 255, 0.4);">[ ENTER ENGINEROOM ]</a>
+          </div>
         </article>
       </section>
 

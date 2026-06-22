@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HyperFrames 數據影片引擎 | Web 能力展覽館</title>
+  <link rel="stylesheet" href="styles.css?v=20260622">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-cyan">
+  <!-- 背景發光特效 -->
+  <div class="cursor-light" aria-hidden="true"></div>
+
+  <!-- 頂部導覽列 -->
+  <header class="site-header">
+    <a class="back-link" href="../" aria-label="返回 Web 能力展覽館">
+      <span class="back-arrow">←</span>
+      <span class="back-text">WEB LAB</span>
+    </a>
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <span>HYPERFRAMES ENGINE</span>
+    </div>
+    <div class="telemetry">
+      <span>FPS <b id="fps-counter">60.0</b></span>
+      <span>STATUS <b class="status-indicator">STANDBY</b></span>
+    </div>
+  </header>
+
+  <!-- 主區塊格行 -->
+  <main class="engine-layout">
+    <!-- 左側：影片播放器舞台 -->
+    <section class="player-stage">
+      <div class="player-frame">
+        <!-- 模擬相機邊框與畫面標記 -->
+        <div class="camera-ui overlay-top-left">REC</div>
+        <div class="camera-ui overlay-top-right">1080P 60FPS</div>
+        <div class="camera-ui overlay-bottom-left">TC: <span id="timecode-display">00:00.00</span></div>
+        <div class="camera-ui overlay-bottom-right">CH 1-2 [████░]</div>
+
+        <!-- 影片渲染舞台 (16:9 比例) -->
+        <div class="stage-viewport" id="video-stage">
+          <!-- 掃描格線背景 -->
+          <div class="grid-bg"></div>
+
+          <!-- 幻燈片/卡片元件 1: 標題頁 (0s - 2s) -->
+          <div class="stage-slide active" id="slide-title" data-start="0" data-duration="2">
+            <div class="title-slide-content">
+              <span class="slide-tag">PROJECT BRIEFING</span>
+              <h1 class="video-title" id="stage-main-title">企業雲端資源與架構分析</h1>
+              <p class="slide-desc">Data Impact & System Transitions</p>
+              <div class="decor-line"></div>
+            </div>
+          </div>
+
+          <!-- 幻燈片/卡片元件 2: 數據圖表頁 (2s - 14s) -->
+          <div class="stage-slide" id="slide-charts" data-start="2" data-duration="12">
+            <!-- 頂部浮動標題 -->
+            <div class="chart-header">
+              <span class="chart-subtitle" id="stage-chart-subtitle">系統資源使用率分析</span>
+              <h2 class="chart-title" id="stage-chart-title">動態圖表相位轉換</h2>
+            </div>
+
+            <!-- SVG 圖表舞台 -->
+            <div class="chart-container">
+              <svg id="chart-svg" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                <!-- 漸變與發光濾鏡 -->
+                <defs>
+                  <linearGradient id="primary-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="var(--theme-primary)" stop-opacity="0.05" />
+                    <stop offset="100%" stop-color="var(--theme-primary)" stop-opacity="0.6" />
+                  </linearGradient>
+                  <linearGradient id="secondary-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stop-color="var(--theme-secondary)" stop-opacity="0.05" />
+                    <stop offset="100%" stop-color="var(--theme-secondary)" stop-opacity="0.6" />
+                  </linearGradient>
+                  <filter id="glow-effect" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+
+                <!-- 背景格線與標籤 -->
+                <g class="chart-grid">
+                  <!-- Y 軸參考線 -->
+                  <line x1="100" y1="50" x2="700" y2="50" stroke="var(--grid-line)" stroke-dasharray="4" />
+                  <line x1="100" y1="130" x2="700" y2="130" stroke="var(--grid-line)" stroke-dasharray="4" />
+                  <line x1="100" y1="210" x2="700" y2="210" stroke="var(--grid-line)" stroke-dasharray="4" />
+                  <line x1="100" y1="290" x2="700" y2="290" stroke="var(--grid-line)" stroke-dasharray="4" />
+                  <line x1="100" y1="370" x2="700" y2="370" stroke="var(--grid-line)" />
+
+                  <!-- Y 軸標籤 -->
+                  <text x="80" y="55" fill="var(--muted)" font-size="12" text-anchor="end" font-family="JetBrains Mono">100%</text>
+                  <text x="80" y="135" fill="var(--muted)" font-size="12" text-anchor="end" font-family="JetBrains Mono">75%</text>
+                  <text x="80" y="215" fill="var(--muted)" font-size="12" text-anchor="end" font-family="JetBrains Mono">50%</text>
+                  <text x="80" y="295" fill="var(--muted)" font-size="12" text-anchor="end" font-family="JetBrains Mono">25%</text>
+                  <text x="80" y="375" fill="var(--muted)" font-size="12" text-anchor="end" font-family="JetBrains Mono">0%</text>
+                </g>
+
+                <!-- X 軸標籤群組 -->
+                <g id="x-axis-labels" fill="var(--muted)" font-size="12" font-family="JetBrains Mono" text-anchor="middle">
+                  <text x="180" y="405">CPU</text>
+                  <text x="300" y="405">Memory</text>
+                  <text x="420" y="405">Storage</text>
+                  <text x="540" y="405">Network</text>
+                  <text x="660" y="405">GPU</text>
+                </g>
+
+                <!-- 1. 長條圖 (Bar Chart) 元件群組 -->
+                <g id="bar-chart-group" filter="url(#glow-effect)">
+                  <rect class="bar-rect" x="155" y="370" width="50" height="0" fill="url(#primary-grad)" rx="4" />
+                  <rect class="bar-rect" x="275" y="370" width="50" height="0" fill="url(#primary-grad)" rx="4" />
+                  <rect class="bar-rect" x="395" y="370" width="50" height="0" fill="url(#primary-grad)" rx="4" />
+                  <rect class="bar-rect" x="515" y="370" width="50" height="0" fill="url(#primary-grad)" rx="4" />
+                  <rect class="bar-rect" x="635" y="370" width="50" height="0" fill="url(#primary-grad)" rx="4" />
+                </g>
+
+                <!-- 2. 折線圖 (Line Chart) 元件群組 (路徑與點) -->
+                <g id="line-chart-group">
+                  <path id="line-path" fill="none" stroke="var(--theme-primary)" stroke-width="5" filter="url(#glow-effect)" stroke-linecap="round" stroke-linejoin="round" />
+                  <g id="line-points" filter="url(#glow-effect)"></g>
+                </g>
+
+                <!-- 3. 圓餅/環狀圖 (Donut Chart) 元件群組 -->
+                <g id="donut-chart-group" transform="translate(400, 210)" style="opacity: 0;">
+                  <!-- 外圈環形軌道 -->
+                  <circle cx="0" cy="0" r="120" fill="none" stroke="var(--grid-line)" stroke-width="24" />
+                  <!-- 環狀數據段 (Donut segments) -->
+                  <circle id="donut-seg-1" cx="0" cy="0" r="120" fill="none" stroke="var(--theme-primary)" stroke-width="26" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="753.98" stroke-dashoffset="753.98" stroke-linecap="round" />
+                  <circle id="donut-seg-2" cx="0" cy="0" r="120" fill="none" stroke="var(--theme-secondary)" stroke-width="26" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="753.98" stroke-dashoffset="753.98" stroke-linecap="round" />
+                  <circle id="donut-seg-3" cx="0" cy="0" r="120" fill="none" stroke="var(--theme-accent)" stroke-width="26" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="753.98" stroke-dashoffset="753.98" stroke-linecap="round" />
+                  <circle id="donut-seg-4" cx="0" cy="0" r="120" fill="none" stroke="rgba(163, 112, 247, 1)" stroke-width="26" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="753.98" stroke-dashoffset="753.98" stroke-linecap="round" />
+                  <circle id="donut-center-glow" cx="0" cy="0" r="90" fill="rgba(56, 232, 255, 0.03)" filter="url(#glow-effect)" />
+                  <!-- 中心文字 -->
+                  <text id="donut-label-value" cx="0" cy="-10" fill="var(--ink)" font-size="36" font-weight="800" text-anchor="middle" font-family="JetBrains Mono">88%</text>
+                  <text id="donut-label-title" cx="0" cy="25" fill="var(--muted)" font-size="12" font-weight="600" text-anchor="middle" letter-spacing="1">AVG LOAD</text>
+                </g>
+
+                <!-- 4. 雷達圖 (Radar Chart) 元件群組 -->
+                <g id="radar-chart-group" transform="translate(400, 210)" style="opacity: 0;">
+                  <!-- 雷達背景多邊形 -->
+                  <polygon points="0,-140 133,-43 82,113 -82,113 -133,-43" fill="none" stroke="var(--grid-line)" stroke-width="1.5" />
+                  <polygon points="0,-105 100,-32 62,85 -62,85 -100,-32" fill="none" stroke="var(--grid-line)" stroke-dasharray="4" />
+                  <polygon points="0,-70 67,-22 41,57 -41,57 -67,-22" fill="none" stroke="var(--grid-line)" stroke-width="1" />
+                  <polygon points="0,-35 33,-11 21,28 -21,28 -33,-11" fill="none" stroke="var(--grid-line)" stroke-dasharray="2" />
+                  <!-- 網格軸線 -->
+                  <line x1="0" y1="0" x2="0" y2="-140" stroke="var(--grid-line)" />
+                  <line x1="0" y1="0" x2="133" y2="-43" stroke="var(--grid-line)" />
+                  <line x1="0" y1="0" x2="82" y2="113" stroke="var(--grid-line)" />
+                  <line x1="0" y1="0" x2="-82" y2="113" stroke="var(--grid-line)" />
+                  <line x1="0" y1="0" x2="-133" y2="-43" stroke="var(--grid-line)" />
+                  <!-- 雷達軸標籤 -->
+                  <text x="0" y="-150" fill="var(--muted)" font-size="11" text-anchor="middle" font-family="JetBrains Mono">EFFICIENCY</text>
+                  <text x="145" y="-38" fill="var(--muted)" font-size="11" text-anchor="start" font-family="JetBrains Mono">SPEED</text>
+                  <text x="92" y="130" fill="var(--muted)" font-size="11" text-anchor="start" font-family="JetBrains Mono">STABILITY</text>
+                  <text x="-92" y="130" fill="var(--muted)" font-size="11" text-anchor="end" font-family="JetBrains Mono">COST</text>
+                  <text x="-145" y="-38" fill="var(--muted)" font-size="11" text-anchor="end" font-family="JetBrains Mono">SECURITY</text>
+                  <!-- 數據多邊形 -->
+                  <polygon id="radar-polygon" points="0,0 0,0 0,0 0,0 0,0" fill="rgba(56, 232, 255, 0.22)" stroke="var(--theme-primary)" stroke-width="3" filter="url(#glow-effect)" />
+                  <g id="radar-dots" filter="url(#glow-effect)"></g>
+                </g>
+
+                <!-- 5. 圓餅圖 (Pie Chart) 元件群組 -->
+                <g id="pie-chart-group" transform="translate(400, 210)" style="opacity: 0;">
+                  <circle cx="0" cy="0" r="120" fill="none" stroke="var(--grid-line)" stroke-width="2" />
+                  <circle id="pie-seg-1" cx="0" cy="0" r="60" fill="none" stroke="var(--theme-primary)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
+                  <circle id="pie-seg-2" cx="0" cy="0" r="60" fill="none" stroke="var(--theme-secondary)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
+                  <circle id="pie-seg-3" cx="0" cy="0" r="60" fill="none" stroke="var(--theme-accent)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
+                  <circle id="pie-seg-4" cx="0" cy="0" r="60" fill="none" stroke="rgba(163, 112, 247, 0.85)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
+                  <g id="pie-labels" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">
+                    <text x="45" y="-45">40%</text>
+                    <text x="45" y="55">30%</text>
+                    <text x="-55" y="55">20%</text>
+                    <text x="-45" y="-45">10%</text>
+                  </g>
+                </g>
+
+                <!-- 6. 氣泡權重圖 (Bubble Weight Chart) 元件群組 -->
+                <g id="bubble-chart-group" style="opacity: 0;">
+                  <circle id="bubble-1" cx="240" cy="220" r="45" fill="rgba(56, 232, 255, 0.15)" stroke="var(--theme-primary)" stroke-width="2.5" filter="url(#glow-effect)" />
+                  <circle id="bubble-2" cx="370" cy="150" r="38" fill="rgba(109, 255, 180, 0.15)" stroke="var(--theme-secondary)" stroke-width="2.5" filter="url(#glow-effect)" />
+                  <circle id="bubble-3" cx="360" cy="290" r="30" fill="rgba(255, 209, 102, 0.15)" stroke="var(--theme-accent)" stroke-width="2.5" filter="url(#glow-effect)" />
+                  <circle id="bubble-4" cx="490" cy="270" r="30" fill="rgba(255, 111, 125, 0.15)" stroke="#ff6f7d" stroke-width="2.5" filter="url(#glow-effect)" />
+                  <circle id="bubble-5" cx="540" cy="160" r="24" fill="rgba(163, 112, 247, 0.15)" stroke="#a370f7" stroke-width="2.5" filter="url(#glow-effect)" />
+                  <g font-family="JetBrains Mono" font-size="10" font-weight="700" fill="var(--ink)" text-anchor="middle">
+                    <text x="240" y="215">CPU<tspan x="240" dy="13" fill="var(--theme-primary)">35%</tspan></text>
+                    <text x="370" y="145">MEM<tspan x="370" dy="13" fill="var(--theme-secondary)">30%</tspan></text>
+                    <text x="360" y="285">STOR<tspan x="360" dy="13" fill="var(--theme-accent)">15%</tspan></text>
+                    <text x="490" y="265">NET<tspan x="490" dy="13" fill="#ff6f7d">12%</tspan></text>
+                    <text x="540" y="155">GPU<tspan x="540" dy="13" fill="#a370f7">8%</tspan></text>
+                  </g>
+                </g>
+
+                <!-- 7. 波形折線與桑基熱流圖 (Waveform & Sankey Chart) 元件群組 -->
+                <g id="waveform-chart-group" style="opacity: 0;">
+                  <!-- 左右垂直發光邊界線，完美對接波形折線與桑基熱流圖 -->
+                  <line id="sankey-left-bar" x1="100" y1="100" x2="100" y2="320" stroke="var(--theme-primary)" stroke-width="3" filter="url(#glow-effect)" stroke-linecap="round" style="opacity: 0;" />
+                  <line id="sankey-right-bar" x1="700" y1="100" x2="700" y2="320" stroke="var(--theme-primary)" stroke-width="3" filter="url(#glow-effect)" stroke-linecap="round" style="opacity: 0;" />
+
+                  <path id="wave-path-1" fill="none" stroke="var(--theme-primary)" stroke-width="3" filter="url(#glow-effect)" stroke-linecap="round" />
+                  <path id="wave-path-2" fill="none" stroke="var(--theme-secondary)" stroke-width="2.5" filter="url(#glow-effect)" stroke-linecap="round" />
+                  <path id="wave-path-3" fill="none" stroke="var(--theme-accent)" stroke-width="2" filter="url(#glow-effect)" stroke-linecap="round" />
+                  <line id="waveform-center-line" x1="100" y1="210" x2="700" y2="210" stroke="var(--grid-line)" />
+                </g>
+
+                <!-- 9. 流程時間軸 (Flowchart Timeline Chart) 元件群組 -->
+                <g id="flowchart-chart-group" style="opacity: 0;">
+                  <!-- 連接線 -->
+                  <path id="flow-line-1" d="M 230,210 L 310,210" stroke="var(--grid-line)" stroke-width="4" stroke-linecap="round" />
+                  <path id="flow-line-2" d="M 370,210 L 450,210" stroke="var(--grid-line)" stroke-width="4" stroke-linecap="round" />
+                  <path id="flow-line-3" d="M 510,210 L 590,210" stroke="var(--grid-line)" stroke-width="4" stroke-linecap="round" />
+                  <!-- 流動光點 -->
+                  <circle id="flow-dot-1" cx="230" cy="210" r="4" fill="var(--theme-primary)" filter="url(#glow-effect)" style="opacity: 0;" />
+                  <circle id="flow-dot-2" cx="370" cy="210" r="4" fill="var(--theme-secondary)" filter="url(#glow-effect)" style="opacity: 0;" />
+                  <circle id="flow-dot-3" cx="510" cy="210" r="4" fill="var(--theme-accent)" filter="url(#glow-effect)" style="opacity: 0;" />
+                  <!-- 流程節點 -->
+                  <g class="flow-node" id="flow-node-1" transform="translate(200, 210)">
+                    <circle cx="0" cy="0" r="26" fill="var(--panel-bg)" stroke="var(--theme-primary)" stroke-width="3" filter="url(#glow-effect)" />
+                    <text x="0" y="5" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="var(--theme-primary)" text-anchor="middle">01</text>
+                    <text x="0" y="45" font-size="11" font-weight="600" fill="var(--muted)" text-anchor="middle">Data Ingest</text>
+                  </g>
+                  <g class="flow-node" id="flow-node-2" transform="translate(340, 210)">
+                    <circle cx="0" cy="0" r="26" fill="var(--panel-bg)" stroke="var(--theme-secondary)" stroke-width="3" filter="url(#glow-effect)" />
+                    <text x="0" y="5" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="var(--theme-secondary)" text-anchor="middle">02</text>
+                    <text x="0" y="45" font-size="11" font-weight="600" fill="var(--muted)" text-anchor="middle">Model Filter</text>
+                  </g>
+                  <g class="flow-node" id="flow-node-3" transform="translate(480, 210)">
+                    <circle cx="0" cy="0" r="26" fill="var(--panel-bg)" stroke="var(--theme-accent)" stroke-width="3" filter="url(#glow-effect)" />
+                    <text x="0" y="5" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="var(--theme-accent)" text-anchor="middle">03</text>
+                    <text x="0" y="45" font-size="11" font-weight="600" fill="var(--muted)" text-anchor="middle">Process CPU</text>
+                  </g>
+                  <g class="flow-node" id="flow-node-4" transform="translate(620, 210)">
+                    <circle cx="0" cy="0" r="26" fill="var(--panel-bg)" stroke="rgba(163, 112, 247, 1)" stroke-width="3" filter="url(#glow-effect)" />
+                    <text x="0" y="5" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="rgba(163, 112, 247, 1)" text-anchor="middle">04</text>
+                    <text x="0" y="45" font-size="11" font-weight="600" fill="var(--muted)" text-anchor="middle">Vault Store</text>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 幻燈片/卡片元件 3: 結論總結頁 (24.5s - 27.5s) -->
+          <div class="stage-slide" id="slide-summary" data-start="24.5" data-duration="3">
+            <div class="summary-slide-content">
+              <span class="slide-tag">ANALYSIS COMPLETE</span>
+              <h2 class="summary-headline">系統效能已最佳化</h2>
+              <div class="summary-grid">
+                <div class="summary-metric">
+                  <span class="metric-val text-grow" id="metric-val-1">0%</span>
+                  <span class="metric-lbl">資源效率提升</span>
+                </div>
+                <div class="summary-metric">
+                  <span class="metric-val text-grow" id="metric-val-2">0%</span>
+                  <span class="metric-lbl">伺服器成本降低</span>
+                </div>
+                <div class="summary-metric">
+                  <span class="metric-val text-grow" id="metric-val-3">0ms</span>
+                  <span class="metric-lbl">平均回應延遲</span>
+                </div>
+              </div>
+              <div class="summary-footer">報告產出時間: 2026-06-22</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 時間軸播放控制條 -->
+      <div class="player-controls">
+        <div class="btn-group">
+          <button class="ctrl-btn" id="play-pause-btn" type="button" aria-label="播放影片">▶</button>
+        </div>
+        <div class="timeline-container">
+          <input type="range" class="timeline-scrubber" id="timeline-scrubber" min="0" max="100" value="0" step="0.05">
+          <!-- 時間刻度輔助線 -->
+          <div class="timeline-ticks">
+            <span>Title</span>
+            <span>Bar Q1</span>
+            <span>Bar Q2</span>
+            <span>Line</span>
+            <span>Donut</span>
+            <span>Pie</span>
+            <span>Bubble</span>
+            <span>Radar</span>
+            <span>Wave</span>
+            <span>Heatmap</span>
+            <span>Flow</span>
+            <span>Summary</span>
+          </div>
+        </div>
+        <div class="telemetry-compact">
+          <span class="time-display" id="time-display">0.0s / 17.0s</span>
+          <select id="speed-select" class="speed-select" aria-label="播放速度">
+            <option value="0.5">0.5x 慢速</option>
+            <option value="1" selected>1.0x 正常</option>
+            <option value="2">2.0x 快速</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右側：影片編輯與自訂控制面板 -->
+    <aside class="editor-sidebar">
+      <div class="sidebar-section glass-panel">
+        <h3 class="panel-section-title">自訂影片屬性</h3>
+        
+        <div class="control-group">
+          <label for="input-main-title" class="control-label">主標題文字</label>
+          <input type="text" id="input-main-title" class="form-input" value="企業雲端資源與架構分析" placeholder="修改影片首頁主標題...">
+          <small class="helper-text">修改此文字將即時反應在影片的「標題頁」</small>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">主題配色</label>
+          <div class="color-presets">
+            <button class="color-preset-btn is-active theme-cyan-btn" data-theme="cyan" type="button" title="霓虹青">
+              <span class="color-dot" style="background-color: #38e8ff;"></span> 青綠
+            </button>
+            <button class="color-preset-btn theme-emerald-btn" data-theme="emerald" type="button" title="極光綠">
+              <span class="color-dot" style="background-color: #6dffb4;"></span> 極光
+            </button>
+            <button class="color-preset-btn theme-solar-btn" data-theme="solar" type="button" title="烈陽金">
+              <span class="color-dot" style="background-color: #ffd166;"></span> 烈陽
+            </button>
+            <button class="color-preset-btn theme-violet-btn" data-theme="violet" type="button" title="皇家紫">
+              <span class="color-dot" style="background-color: #a370f7;"></span> 紫幻
+            </button>
+          </div>
+          <small class="helper-text">更換配色將即時變更影片整體視覺、圖表發光與背景光暈</small>
+        </div>
+      </div>
+
+      <div class="sidebar-section glass-panel">
+        <h3 class="panel-section-title">數據與圖表控制</h3>
+        
+        <div class="control-group">
+          <label class="control-label">快速跳轉動畫相位</label>
+          <div class="phase-jump-group">
+            <button class="jump-btn" data-time="0" type="button">1. 標題封面 (0s)</button>
+            <button class="jump-btn" data-time="2.2" type="button">2. 長條圖 Q1 (2.2s)</button>
+            <button class="jump-btn" data-time="4.0" type="button">3. 長條圖 Q2 (4s)</button>
+            <button class="jump-btn" data-time="5.5" type="button">4. 折線圖轉換 (5.5s)</button>
+            <button class="jump-btn" data-time="7.5" type="button">5. 環狀圖 100% (7.5s)</button>
+            <button class="jump-btn" data-time="10.0" type="button">6. 圓餅圖轉換 (10s)</button>
+            <button class="jump-btn" data-time="12.0" type="button">7. 氣泡權重圖 (12s)</button>
+            <button class="jump-btn" data-time="14.5" type="button">8. 雷達指標分析 (14.5s)</button>
+            <button class="jump-btn" data-time="16.5" type="button">9. 波形折線圖 (16.5s)</button>
+            <button class="jump-btn" data-time="19.0" type="button">10. 熱流能量圖 (19s)</button>
+            <button class="jump-btn" data-time="21.5" type="button">11. 流程時間軸 (21.5s)</button>
+            <button class="jump-btn" data-time="24.5" type="button">12. 結論總結 (24.5s)</button>
+          </div>
+          <small class="helper-text">模擬 HyperFrames 隨機尋軌渲染機制，快速跳躍至影片特定影格</small>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">變更分析數據預設值</label>
+          <div class="data-preset-selector">
+            <button class="preset-data-btn is-active" data-preset="normal" type="button">一般狀態</button>
+            <button class="preset-data-btn" data-preset="stress" type="button">高壓負載測試</button>
+            <button class="preset-data-btn" data-preset="optimized" type="button">最佳化節能</button>
+          </div>
+          <small class="helper-text">改變數據後，影片在播放到對應圖表時會以新的數值進行動畫過渡</small>
+        </div>
+      </div>
+
+      <!-- 技術解說 -->
+      <div class="sidebar-section glass-panel info-panel">
+        <h4 class="info-title">HyperFrames 技術原理解析</h4>
+        <p class="info-desc">
+          <b>HyperFrames</b> 將「影片視為代碼 (Video as Code)」。
+          在這個展示中，我們並非在使用傳統的預錄 MP4 影片，而是透過 <b>GSAP 動畫引擎</b> 去驅動一個實時的 HTML / SVG 舞台。
+        </p>
+        <p class="info-desc">
+          當拖動下方的 <b>時間軸拉條</b> 時，JavaScript 會精準調用 <code>timeline.seek()</code>。這正是 HeyGen 用於雲端渲染的關鍵機制——只要網頁在特定的時間點上能產生完全一致的畫面（Deterministic Rendering），就能利用 Headless Chrome 進行無痛截影，最後交由 FFmpeg 壓製成高品質影片。
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 導入 GSAP 與核心邏輯 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="app.js?v=20260622"></script>
+</body>
+</html>
