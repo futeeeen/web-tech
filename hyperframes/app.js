@@ -180,17 +180,17 @@ function buildTimeline() {
   const pieAngles = getSliceAngles(chartMix.map((seg) => seg.pie));
 
   // 靜態曲線 d 屬性定義 (與桑基圖結構一致以利平滑 morph)
-  const wave1_A = "M 100,210 C 250,120 250,300 400,210 C 550,120 550,300 700,210";
-  const wave1_B = "M 100,210 C 250,300 250,120 400,210 C 550,300 550,120 700,210";
-  const wave2_A = "M 100,210 C 250,280 250,140 400,210 C 550,280 550,140 700,210";
-  const wave2_B = "M 100,210 C 250,140 250,280 400,210 C 550,140 550,280 700,210";
-  const wave3_A = "M 100,210 C 250,180 250,240 400,210 C 550,180 550,240 700,210";
-  const wave3_B = "M 100,210 C 250,240 250,180 400,210 C 550,240 550,180 700,210";
-  const wave3_flat = "M 100,210 C 250,210 250,210 400,210 C 550,210 550,210 700,210";
+  const wave1_A = "M 100,210 C 200,120 250,300 300,210 C 400,120 500,300 550,210 C 600,120 650,300 700,210";
+  const wave1_B = "M 100,210 C 200,300 250,120 300,210 C 400,300 500,120 550,210 C 600,300 650,120 700,210";
+  const wave2_A = "M 100,210 C 200,280 250,140 300,210 C 400,280 500,140 550,210 C 600,280 650,140 700,210";
+  const wave2_B = "M 100,210 C 200,140 250,280 300,210 C 400,140 500,280 550,210 C 600,140 650,280 700,210";
+  const wave3_A = "M 100,210 C 200,180 250,240 300,210 C 400,180 500,240 550,210 C 600,180 650,240 700,210";
+  const wave3_B = "M 100,210 C 200,240 250,180 300,210 C 400,240 500,180 550,210 C 600,240 650,180 700,210";
+  const wave3_flat = "M 100,210 C 200,210 250,210 300,210 C 350,210 450,210 500,210 C 550,210 600,210 700,210";
   const wave1Trend = [
-    "M 100,230 C 165,190 210,155 280,176 C 350,197 390,138 455,126 C 525,113 555,185 615,166 C 652,154 678,135 700,122",
-    "M 100,226 C 175,150 230,230 305,196 C 370,168 402,110 468,145 C 520,173 560,108 620,132 C 662,148 684,118 700,132",
-    "M 100,222 C 158,252 232,176 306,142 C 385,105 423,196 492,175 C 552,157 590,96 642,118 C 672,130 690,150 700,140",
+    "M 100,230 C 180,180 240,160 310,180 C 370,200 440,130 510,140 C 580,150 630,140 700,122",
+    "M 100,226 C 170,160 230,220 300,200 C 370,180 430,120 500,140 C 570,160 640,120 700,132",
+    "M 100,222 C 160,240 220,180 290,150 C 360,120 440,180 510,170 C 580,160 630,120 700,140",
     "M 100,214 C 175,178 252,186 330,150 C 405,116 455,154 520,122 C 596,85 645,116 700,120"
   ];
   const wave2Trend = [
@@ -738,20 +738,30 @@ function buildTimeline() {
   }, 19.0);
 
   // 定義桑基熱流圖的三條流動主幹線 (起點 X=100，終點 X=700，與波形位置一致，以防斷裂)
-  const sankey1 = "M 100,120 C 250,120 250,210 400,210 C 550,210 550,120 700,120";
-  const sankey2 = "M 100,210 C 250,210 250,210 400,210 C 550,210 550,300 700,300";
-  const sankey3 = "M 100,300 C 250,300 250,210 400,210 C 550,210 550,180 700,180";
+  const sankey1 = "M 100,120 C 200,120 250,165 300,180 C 350,195 450,195 500,180 C 550,165 600,120 700,120";
+  const sankey2 = "M 100,210 C 200,210 250,210 300,210 C 350,210 450,230 500,240 C 550,250 600,300 700,300";
+  const sankey3 = "M 100,300 C 200,300 250,250 300,240 C 350,230 450,210 500,200 C 550,190 600,180 700,180";
 
   // 在變形開始時，將線條端點改為平切 (butt)，以完美貼合垂直錨定柱
   masterTimeline.set(['#wave-path-1', '#wave-path-2', '#wave-path-3'], { strokeLinecap: "butt", strokeDasharray: "none", strokeDashoffset: 0 }, 19.1);
 
   // 波形路徑 1 變形成為 桑基上分流 (加粗為 24px)，明確從波形圖的最後一個狀態 wave1Trend[3] 開始，防止 GSAP 讀取初始值造成跳動斷裂
   masterTimeline.fromTo('#wave-path-1', 
-    { attr: { d: wave1Trend[3] } },
+    { 
+      attr: { d: wave1Trend[3] },
+      strokeWidth: 4,
+      opacity: 0.95,
+      strokeDasharray: "none",
+      strokeDashoffset: 0,
+      strokeLinecap: "butt"
+    },
     {
       attr: { d: sankey1 },
       strokeWidth: 24,
       opacity: 0.8,
+      strokeDasharray: "none",
+      strokeDashoffset: 0,
+      strokeLinecap: "butt",
       duration: 1.2,
       ease: "power2.inOut"
     }, 
@@ -760,11 +770,21 @@ function buildTimeline() {
 
   // 波形路徑 2 變形成為 桑基中分流 (加粗為 36px)，明確從波形圖的最後一個狀態 wave2Trend[3] 開始
   masterTimeline.fromTo('#wave-path-2', 
-    { attr: { d: wave2Trend[3] } },
+    { 
+      attr: { d: wave2Trend[3] },
+      strokeWidth: 2.6,
+      opacity: 0.56,
+      strokeDasharray: "none",
+      strokeDashoffset: 0,
+      strokeLinecap: "butt"
+    },
     {
       attr: { d: sankey2 },
       strokeWidth: 36,
       opacity: 0.8,
+      strokeDasharray: "none",
+      strokeDashoffset: 0,
+      strokeLinecap: "butt",
       duration: 1.2,
       ease: "power2.inOut"
     }, 
@@ -773,11 +793,21 @@ function buildTimeline() {
 
   // 波形路徑 3 變形成為 桑基下分流 (加粗為 16px)，明確從波形圖的最後一個狀態 wave3Trend[3] 開始
   masterTimeline.fromTo('#wave-path-3', 
-    { attr: { d: wave3Trend[3] } },
+    { 
+      attr: { d: wave3Trend[3] },
+      strokeWidth: 1.8,
+      opacity: 0.38,
+      strokeDasharray: "none",
+      strokeDashoffset: 0,
+      strokeLinecap: "butt"
+    },
     {
       attr: { d: sankey3 },
       strokeWidth: 16,
       opacity: 0.85,
+      strokeDasharray: "none",
+      strokeDashoffset: 0,
+      strokeLinecap: "butt",
       duration: 1.2,
       ease: "power2.inOut"
     }, 
