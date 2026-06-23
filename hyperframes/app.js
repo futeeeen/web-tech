@@ -151,9 +151,10 @@ function buildTimeline() {
   gsap.set(".summary-headline", { opacity: 1, y: 0 });
   gsap.set(".summary-metric", { opacity: 1, y: 0 });
 
-  // 重置 Donut 與 Pie 圖表線條，並設定 svgOrigin 避免離心偏移
-  gsap.set(['#donut-seg-1', '#donut-seg-2', '#donut-seg-3', '#donut-seg-4'], { strokeDashoffset: circ, rotation: -90, svgOrigin: "400 210" });
-  gsap.set(['#pie-seg-1', '#pie-seg-2', '#pie-seg-3', '#pie-seg-4'], { strokeDashoffset: circPie, rotation: -90, svgOrigin: "400 210" });
+  // 重置 Donut 與 Pie 圖表線條，清除 GSAP 內建旋轉快取，並重設 transform 屬性避免離心偏移
+  gsap.set(['#donut-seg-1', '#donut-seg-2', '#donut-seg-3', '#donut-seg-4'], { strokeDashoffset: circ, clearProps: "transform,rotation,svgOrigin" });
+  gsap.set(['#pie-seg-1', '#pie-seg-2', '#pie-seg-3', '#pie-seg-4'], { strokeDashoffset: circPie, clearProps: "transform,rotation,svgOrigin" });
+  gsap.set(['#donut-seg-1', '#donut-seg-2', '#donut-seg-3', '#donut-seg-4', '#pie-seg-1', '#pie-seg-2', '#pie-seg-3', '#pie-seg-4'], { attr: { transform: "rotate(-90)" } });
 
   // 重置流程圖元件
   gsap.set(['#flow-line-1', '#flow-line-2', '#flow-line-3'], { strokeDasharray: 80, strokeDashoffset: 80 });
@@ -341,7 +342,7 @@ function buildTimeline() {
   ];
 
   donutSegments.forEach((seg, idx) => {
-    masterTimeline.set(seg.id, { rotation: seg.rotation, svgOrigin: "400 210", strokeDashoffset: circ }, 7.5);
+    masterTimeline.set(seg.id, { attr: { transform: `rotate(${seg.rotation})` }, strokeDashoffset: circ }, 7.5);
     masterTimeline.to(seg.id, {
       strokeDashoffset: circ - seg.length,
       duration: 0.7,
@@ -389,7 +390,7 @@ function buildTimeline() {
   ];
 
   pieSegs.forEach((seg, idx) => {
-    masterTimeline.set(seg.id, { rotation: seg.rotation, svgOrigin: "400 210", strokeDashoffset: circPie }, 10.0);
+    masterTimeline.set(seg.id, { attr: { transform: `rotate(${seg.rotation})` }, strokeDashoffset: circPie }, 10.0);
     masterTimeline.to(seg.id, {
       strokeDashoffset: circPie - seg.length,
       duration: 0.6,
@@ -630,11 +631,11 @@ function buildTimeline() {
   // ==========================================
   masterTimeline.addLabel("scene-summary", 24.5);
 
-  masterTimeline.to(slides.charts, { opacity: 0, duration: 0.4 }, 24.5);
+  masterTimeline.to(slides.charts, { autoAlpha: 0, duration: 0.4 }, 24.5);
   masterTimeline.set(slides.charts, { className: "stage-slide" }, 24.9);
   
-  masterTimeline.set(slides.summary, { className: "stage-slide active", opacity: 0 }, 24.5);
-  masterTimeline.to(slides.summary, { opacity: 1, duration: 0.4 }, 24.6);
+  masterTimeline.set(slides.summary, { className: "stage-slide active" }, 24.5);
+  masterTimeline.to(slides.summary, { autoAlpha: 1, duration: 0.4 }, 24.6);
 
   masterTimeline.fromTo(".summary-headline", 
     { opacity: 0, y: -20 },

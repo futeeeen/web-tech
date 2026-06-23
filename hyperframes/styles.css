@@ -317,7 +317,7 @@ body.playing .status-indicator {
   height: 100%;
   z-index: 2;
   opacity: 0;
-  pointer-events: none;
+  pointer-events: auto; /* 允許滑鼠事件，由 GSAP 的 autoAlpha (visibility) 決定是否阻擋 */
   display: flex;
   align-items: center;
   justify-content: center;
