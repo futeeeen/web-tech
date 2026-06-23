@@ -745,32 +745,44 @@ function buildTimeline() {
   // 在變形開始時，將線條端點改為平切 (butt)，以完美貼合垂直錨定柱
   masterTimeline.set(['#wave-path-1', '#wave-path-2', '#wave-path-3'], { strokeLinecap: "butt", strokeDasharray: "none", strokeDashoffset: 0 }, 19.1);
 
-  // 波形路徑 1 變形成為 桑基上分流 (加粗為 24px)
-  masterTimeline.to('#wave-path-1', {
-    attr: { d: sankey1 },
-    strokeWidth: 24,
-    opacity: 0.8,
-    duration: 1.2,
-    ease: "power2.inOut"
-  }, 19.1);
+  // 波形路徑 1 變形成為 桑基上分流 (加粗為 24px)，明確從波形圖的最後一個狀態 wave1Trend[3] 開始，防止 GSAP 讀取初始值造成跳動斷裂
+  masterTimeline.fromTo('#wave-path-1', 
+    { attr: { d: wave1Trend[3] } },
+    {
+      attr: { d: sankey1 },
+      strokeWidth: 24,
+      opacity: 0.8,
+      duration: 1.2,
+      ease: "power2.inOut"
+    }, 
+    19.1
+  );
 
-  // 波形路徑 2 變形成為 桑基中分流 (加粗為 36px)
-  masterTimeline.to('#wave-path-2', {
-    attr: { d: sankey2 },
-    strokeWidth: 36,
-    opacity: 0.8,
-    duration: 1.2,
-    ease: "power2.inOut"
-  }, 19.1);
+  // 波形路徑 2 變形成為 桑基中分流 (加粗為 36px)，明確從波形圖的最後一個狀態 wave2Trend[3] 開始
+  masterTimeline.fromTo('#wave-path-2', 
+    { attr: { d: wave2Trend[3] } },
+    {
+      attr: { d: sankey2 },
+      strokeWidth: 36,
+      opacity: 0.8,
+      duration: 1.2,
+      ease: "power2.inOut"
+    }, 
+    19.1
+  );
 
-  // 波形路徑 3 變形成為 桑基下分流 (加粗為 16px)
-  masterTimeline.to('#wave-path-3', {
-    attr: { d: sankey3 },
-    strokeWidth: 16,
-    opacity: 0.85,
-    duration: 1.2,
-    ease: "power2.inOut"
-  }, 19.1);
+  // 波形路徑 3 變形成為 桑基下分流 (加粗為 16px)，明確從波形圖的最後一個狀態 wave3Trend[3] 開始
+  masterTimeline.fromTo('#wave-path-3', 
+    { attr: { d: wave3Trend[3] } },
+    {
+      attr: { d: sankey3 },
+      strokeWidth: 16,
+      opacity: 0.85,
+      duration: 1.2,
+      ease: "power2.inOut"
+    }, 
+    19.1
+  );
 
   // ==========================================
   // SCENE 11: 流程時間軸 (21.5s - 24.5s)
