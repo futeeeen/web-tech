@@ -131,9 +131,13 @@
                   <circle id="donut-seg-3" cx="0" cy="0" r="120" fill="none" stroke="var(--theme-accent)" stroke-width="26" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="753.98" stroke-dashoffset="753.98" stroke-linecap="round" />
                   <circle id="donut-seg-4" cx="0" cy="0" r="120" fill="none" stroke="rgba(163, 112, 247, 1)" stroke-width="26" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="753.98" stroke-dashoffset="753.98" stroke-linecap="round" />
                   <circle id="donut-center-glow" cx="0" cy="0" r="90" fill="rgba(56, 232, 255, 0.03)" filter="url(#glow-effect)" />
-                  <!-- 中心文字 -->
-                  <text id="donut-label-value" cx="0" cy="-10" fill="var(--ink)" font-size="36" font-weight="800" text-anchor="middle" font-family="JetBrains Mono">88%</text>
-                  <text id="donut-label-title" cx="0" cy="25" fill="var(--muted)" font-size="12" font-weight="600" text-anchor="middle" letter-spacing="1">AVG LOAD</text>
+                  <!-- 中心數值 HUD -->
+                  <g id="donut-center-hud">
+                    <rect id="donut-value-card" x="-76" y="-42" width="152" height="84" rx="12" />
+                    <line class="donut-value-scan" x1="-54" y1="4" x2="54" y2="4" />
+                    <text id="donut-label-value" x="0" y="-13" fill="var(--ink)" font-size="44" font-weight="900" text-anchor="middle" font-family="JetBrains Mono">88%</text>
+                    <text id="donut-label-title" x="0" y="28" fill="var(--muted)" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="1.4">AVG LOAD</text>
+                  </g>
                 </g>
 
                 <!-- 4. 雷達圖 (Radar Chart) 元件群組 -->
@@ -162,16 +166,20 @@
 
                 <!-- 5. 圓餅圖 (Pie Chart) 元件群組 -->
                 <g id="pie-chart-group" transform="translate(400, 210)" style="opacity: 0;">
-                  <circle cx="0" cy="0" r="120" fill="none" stroke="var(--grid-line)" stroke-width="2" />
-                  <circle id="pie-seg-1" cx="0" cy="0" r="60" fill="none" stroke="var(--theme-primary)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
-                  <circle id="pie-seg-2" cx="0" cy="0" r="60" fill="none" stroke="var(--theme-secondary)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
-                  <circle id="pie-seg-3" cx="0" cy="0" r="60" fill="none" stroke="var(--theme-accent)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
-                  <circle id="pie-seg-4" cx="0" cy="0" r="60" fill="none" stroke="rgba(163, 112, 247, 0.85)" stroke-width="120" filter="url(#glow-effect)" transform="rotate(-90)" stroke-dasharray="376.99" stroke-dashoffset="376.99" />
-                  <g id="pie-labels" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">
-                    <text x="45" y="-45">40%</text>
-                    <text x="45" y="55">30%</text>
-                    <text x="-55" y="55">20%</text>
-                    <text x="-45" y="-45">10%</text>
+                  <circle class="pie-orbit" cx="0" cy="0" r="128" />
+                  <circle class="pie-inner-glow" cx="0" cy="0" r="48" />
+                  <g id="pie-slices" filter="url(#glow-effect)">
+                    <path id="pie-slice-1" class="pie-slice" fill="var(--theme-primary)" />
+                    <path id="pie-slice-2" class="pie-slice" fill="var(--theme-secondary)" />
+                    <path id="pie-slice-3" class="pie-slice" fill="var(--theme-accent)" />
+                    <path id="pie-slice-4" class="pie-slice" fill="rgba(163, 112, 247, 0.9)" />
+                  </g>
+                  <circle class="pie-center-pin" cx="0" cy="0" r="5" />
+                  <g id="pie-labels" font-family="JetBrains Mono" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">
+                    <text id="pie-label-1">40%</text>
+                    <text id="pie-label-2">30%</text>
+                    <text id="pie-label-3">20%</text>
+                    <text id="pie-label-4">10%</text>
                   </g>
                 </g>
 
@@ -200,6 +208,11 @@
                   <path id="wave-path-1" fill="none" stroke="var(--theme-primary)" stroke-width="3" filter="url(#glow-effect)" stroke-linecap="round" />
                   <path id="wave-path-2" fill="none" stroke="var(--theme-secondary)" stroke-width="2.5" filter="url(#glow-effect)" stroke-linecap="round" />
                   <path id="wave-path-3" fill="none" stroke="var(--theme-accent)" stroke-width="2" filter="url(#glow-effect)" stroke-linecap="round" />
+                  <g id="wave-sample-points" filter="url(#glow-effect)">
+                    <circle id="wave-sample-1" r="5" fill="var(--theme-primary)" />
+                    <circle id="wave-sample-2" r="4" fill="#ff6f7d" />
+                    <circle id="wave-sample-3" r="3.5" fill="var(--theme-accent)" />
+                  </g>
                   <line id="waveform-center-line" x1="100" y1="210" x2="700" y2="210" stroke="var(--grid-line)" />
                 </g>
 

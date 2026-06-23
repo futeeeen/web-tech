@@ -111,12 +111,73 @@ function valToY(val) {
   return yMin - (val * yHeightRange);
 }
 
+const chartMix = [
+  { donut: 35, pie: 40, color: 'var(--theme-primary)' },
+  { donut: 30, pie: 30, color: 'var(--theme-secondary)' },
+  { donut: 20, pie: 20, color: 'var(--theme-accent)' },
+  { donut: 15, pie: 10, color: 'rgba(163, 112, 247, 0.9)' }
+];
+
+const donutRadius = 120;
+const donutStrokeWidth = 26;
+const donutOuterRadius = donutRadius + donutStrokeWidth / 2;
+const donutInnerRadius = donutRadius - donutStrokeWidth / 2;
+const pieOuterRadius = 124;
+const pieInnerStartRadius = donutInnerRadius;
+const pieOuterStartRadius = donutOuterRadius;
+const pieInnerEndRadius = 4;
+const pieGapDeg = 1.25;
+const pieStartGapDeg = 3.6;
+const pieSliceIds = ['#pie-slice-1', '#pie-slice-2', '#pie-slice-3', '#pie-slice-4'];
+const pieLabelIds = ['#pie-label-1', '#pie-label-2', '#pie-label-3', '#pie-label-4'];
+
+function polarToCartesian(radius, angleDeg) {
+  const angleRad = (angleDeg - 90) * Math.PI / 180;
+  return {
+    x: Math.cos(angleRad) * radius,
+    y: Math.sin(angleRad) * radius
+  };
+}
+
+function makeArcSlice(startDeg, endDeg, innerRadius, outerRadius, gapDeg = 0) {
+  const start = startDeg + gapDeg;
+  const end = endDeg - gapDeg;
+  const outerStart = polarToCartesian(outerRadius, start);
+  const outerEnd = polarToCartesian(outerRadius, end);
+  const innerEnd = polarToCartesian(innerRadius, end);
+  const innerStart = polarToCartesian(innerRadius, start);
+  const largeArc = end - start > 180 ? 1 : 0;
+
+  return [
+    `M ${outerStart.x.toFixed(3)} ${outerStart.y.toFixed(3)}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${outerEnd.x.toFixed(3)} ${outerEnd.y.toFixed(3)}`,
+    `L ${innerEnd.x.toFixed(3)} ${innerEnd.y.toFixed(3)}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${innerStart.x.toFixed(3)} ${innerStart.y.toFixed(3)}`,
+    'Z'
+  ].join(' ');
+}
+
+function getSliceAngles(values) {
+  let cursor = 0;
+  return values.map((value) => {
+    const start = cursor;
+    const end = cursor + value * 3.6;
+    cursor = end;
+    return { start, end, mid: (start + end) / 2 };
+  });
+}
+
+function getPieLabelPosition(midDeg, radius = 70) {
+  return polarToCartesian(radius, midDeg);
+}
+
 // --- 初始化 GSAP 時間軸 ---
 function buildTimeline() {
   const data = dataPresets[currentPreset];
   const totalDuration = 27.5; // 總影片長度擴展至 27.5 秒
   const circ = 753.98; // Donut 圓形周長 2 * Math.PI * 120
-  const circPie = 376.99; // Pie 圓形周長 2 * Math.PI * 60
+  const donutAngles = getSliceAngles(chartMix.map((seg) => seg.donut));
+  const pieAngles = getSliceAngles(chartMix.map((seg) => seg.pie));
 
   // 靜態曲線 d 屬性定義 (與桑基圖結構一致以利平滑 morph)
   const wave1_A = "M 100,210 C 250,120 250,300 400,210 C 550,120 550,300 700,210";
@@ -126,6 +187,24 @@ function buildTimeline() {
   const wave3_A = "M 100,210 C 250,180 250,240 400,210 C 550,180 550,240 700,210";
   const wave3_B = "M 100,210 C 250,240 250,180 400,210 C 550,240 550,180 700,210";
   const wave3_flat = "M 100,210 C 250,210 250,210 400,210 C 550,210 550,210 700,210";
+  const wave1Trend = [
+    "M 100,230 C 165,190 210,155 280,176 C 350,197 390,138 455,126 C 525,113 555,185 615,166 C 652,154 678,135 700,122",
+    "M 100,226 C 175,150 230,230 305,196 C 370,168 402,110 468,145 C 520,173 560,108 620,132 C 662,148 684,118 700,132",
+    "M 100,222 C 158,252 232,176 306,142 C 385,105 423,196 492,175 C 552,157 590,96 642,118 C 672,130 690,150 700,140",
+    "M 100,214 C 175,178 252,186 330,150 C 405,116 455,154 520,122 C 596,85 645,116 700,120"
+  ];
+  const wave2Trend = [
+    "M 100,210 C 170,248 235,242 305,214 C 372,187 426,228 492,236 C 555,244 610,196 700,205",
+    "M 100,218 C 178,255 235,190 310,206 C 384,222 420,258 490,223 C 558,188 612,224 700,190",
+    "M 100,220 C 170,176 238,230 316,250 C 396,272 448,202 522,206 C 596,210 640,245 700,218",
+    "M 100,216 C 174,238 238,212 318,224 C 398,237 458,201 530,210 C 610,220 660,191 700,202"
+  ];
+  const wave3Trend = [
+    "M 100,210 C 180,204 238,214 315,206 C 392,198 450,216 528,208 C 606,200 650,210 700,206",
+    "M 100,208 C 175,196 246,202 320,212 C 395,223 454,200 530,194 C 608,188 652,202 700,198",
+    "M 100,211 C 184,222 252,205 322,198 C 394,191 456,214 528,220 C 603,226 656,208 700,212",
+    "M 100,209 C 182,203 250,211 330,204 C 412,198 470,206 540,201 C 614,196 660,202 700,199"
+  ];
 
   // 如果有舊的時間軸，先暫停並銷毀
   if (masterTimeline) {
@@ -145,6 +224,9 @@ function buildTimeline() {
   // 重置投影片與新圖表群組透明度
   gsap.set([slides.title, slides.charts, slides.summary], { autoAlpha: 0 });
   gsap.set([donutGroup, pieGroup, bubbleGroup, radarGroup, waveformGroup, flowchartGroup], { autoAlpha: 0 });
+  gsap.set([donutGroup, pieGroup], { clearProps: 'transform,scale,transformOrigin' });
+  gsap.set(donutGroup, { attr: { transform: 'translate(400, 210)' } });
+  gsap.set(pieGroup, { attr: { transform: 'translate(400, 210)' } });
   
   // 重置標題與結論頁面的動畫內容
   gsap.set(".title-slide-content", { opacity: 1, y: 0 });
@@ -153,8 +235,26 @@ function buildTimeline() {
 
   // 重置 Donut 與 Pie 圖表線條，清除 GSAP 內建旋轉快取，並重設 transform 屬性避免離心偏移
   gsap.set(['#donut-seg-1', '#donut-seg-2', '#donut-seg-3', '#donut-seg-4'], { strokeDashoffset: circ, clearProps: "transform,rotation,svgOrigin" });
-  gsap.set(['#pie-seg-1', '#pie-seg-2', '#pie-seg-3', '#pie-seg-4'], { strokeDashoffset: circPie, clearProps: "transform,rotation,svgOrigin" });
-  gsap.set(['#donut-seg-1', '#donut-seg-2', '#donut-seg-3', '#donut-seg-4', '#pie-seg-1', '#pie-seg-2', '#pie-seg-3', '#pie-seg-4'], { attr: { transform: "rotate(-90)" } });
+  gsap.set(['#donut-seg-1', '#donut-seg-2', '#donut-seg-3', '#donut-seg-4'], { attr: { transform: "rotate(-90)" } });
+  gsap.set('#donut-center-hud', { opacity: 0, scale: 0.88, transformOrigin: "center center" });
+  pieSliceIds.forEach((id, index) => {
+    const angle = donutAngles[index];
+    const labelPoint = getPieLabelPosition(pieAngles[index].mid);
+    gsap.set(id, {
+      attr: { d: makeArcSlice(angle.start, angle.end, pieInnerStartRadius, pieOuterStartRadius, pieStartGapDeg) },
+      opacity: 0,
+      scale: 1,
+      transformOrigin: 'center center'
+    });
+    gsap.set(pieLabelIds[index], {
+      attr: { x: labelPoint.x.toFixed(1), y: labelPoint.y.toFixed(1) },
+      opacity: 0,
+      scale: 0.8,
+      transformOrigin: 'center center'
+    });
+    document.querySelector(pieLabelIds[index]).textContent = `${chartMix[index].pie}%`;
+  });
+  gsap.set(['.pie-orbit', '.pie-inner-glow', '.pie-center-pin'], { opacity: 0, scale: 0.85, transformOrigin: 'center center' });
 
   // 重置流程圖元件
   gsap.set(['#flow-line-1', '#flow-line-2', '#flow-line-3'], { strokeDasharray: 80, strokeDashoffset: 80 });
@@ -168,6 +268,8 @@ function buildTimeline() {
   gsap.set('#wave-path-1', { attr: { d: wave1_A }, strokeWidth: 3.5, opacity: 1, strokeLinecap: "round" });
   gsap.set('#wave-path-2', { attr: { d: wave2_A }, strokeWidth: 2.5, opacity: 0.7, strokeLinecap: "round" });
   gsap.set('#wave-path-3', { attr: { d: wave3_A }, strokeWidth: 1.5, opacity: 0.4, strokeLinecap: "round" });
+  gsap.set(['#wave-path-1', '#wave-path-2', '#wave-path-3'], { strokeDasharray: 900, strokeDashoffset: 900 });
+  gsap.set('#wave-sample-points circle', { opacity: 0, attr: { cx: 100, cy: 210, r: (i) => [5, 4, 3.5][i] } });
   gsap.set(['#sankey-left-bar', '#sankey-right-bar'], { opacity: 0 });
 
   // 預先建立折線圖的點
@@ -181,7 +283,7 @@ function buildTimeline() {
     circle.setAttribute('fill', 'var(--theme-primary)');
     circle.setAttribute('stroke', '#ffffff');
     circle.setAttribute('stroke-width', '2');
-    gsap.set(circle, { opacity: 0, scale: 0, transformOrigin: "center" });
+    gsap.set(circle, { opacity: 0, scale: 1, attr: { r: 3 } });
     linePointsGroup.appendChild(circle);
   });
 
@@ -196,12 +298,13 @@ function buildTimeline() {
   ];
   radarAxes.forEach((axis) => {
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', 400);
-    circle.setAttribute('cy', 210);
+    circle.setAttribute('cx', 0);
+    circle.setAttribute('cy', 0);
     circle.setAttribute('r', 5);
     circle.setAttribute('fill', '#ffffff');
     circle.setAttribute('stroke', 'var(--theme-primary)');
     circle.setAttribute('stroke-width', '2.5');
+    gsap.set(circle, { opacity: 0, attr: { r: 3 } });
     radarDotsGroup.appendChild(circle);
   });
 
@@ -298,21 +401,25 @@ function buildTimeline() {
 
   masterTimeline.to(linePath, {
     strokeDashoffset: 0,
-    duration: 1.2,
-    ease: "power2.out"
-  }, 6.1);
+    duration: 1.45,
+    ease: "power2.inOut"
+  }, 6.05);
 
   const dots = linePointsGroup.querySelectorAll('.dot-node');
   dots.forEach((dot, index) => {
     const targetY = valToY(data.valuesB[index]);
-    masterTimeline.set(dot, { attr: { cy: yMin }, opacity: 0, scale: 0 }, 5.5);
-    masterTimeline.to(dot, {
-      attr: { cy: targetY },
-      opacity: 1,
+    masterTimeline.set(dot, {
+      attr: { cx: xCoords[index], cy: targetY, r: 3 },
+      opacity: 0,
       scale: 1,
-      duration: 0.8,
-      ease: "back.out(1.5)"
-    }, 6.3 + index * 0.1);
+      clearProps: "transform"
+    }, 5.5);
+    masterTimeline.to(dot, {
+      attr: { r: 6 },
+      opacity: 1,
+      duration: 0.55,
+      ease: "sine.out"
+    }, 6.2 + index * 0.18);
   });
 
   // ==========================================
@@ -324,22 +431,32 @@ function buildTimeline() {
     duration: 0.2 
   }, 7.5);
 
-  // 隱藏折線
-  masterTimeline.to(linePath, { opacity: 0, duration: 0.4 }, 7.6);
-  masterTimeline.to(dots, { opacity: 0, scale: 0, duration: 0.4 }, 7.6);
-  masterTimeline.to('#x-axis-labels', { opacity: 0, duration: 0.3 }, 7.6);
-  masterTimeline.to('.chart-grid', { opacity: 0.1, duration: 0.4 }, 7.6);
+  // 隱藏折線，保留一點重疊時間讓環狀圖接上，不會突然斷景
+  masterTimeline.to(dots, {
+    opacity: 0,
+    attr: { r: 3 },
+    duration: 0.45,
+    ease: "sine.inOut",
+    stagger: { each: 0.06, from: "end" }
+  }, 7.35);
+  masterTimeline.to(linePath, {
+    strokeDashoffset: -1000,
+    opacity: 0,
+    duration: 0.75,
+    ease: "power2.inOut"
+  }, 7.4);
+  masterTimeline.to('#x-axis-labels', { opacity: 0, duration: 0.45, ease: "sine.inOut" }, 7.45);
+  masterTimeline.to('.chart-grid', { opacity: 0.1, duration: 0.6, ease: "sine.inOut" }, 7.45);
 
   // 顯示 Donut 並繪製四個分段 (總和 100% 跑滿)
-  masterTimeline.to(donutGroup, { autoAlpha: 1, duration: 0.4 }, 7.8);
+  masterTimeline.to(donutGroup, { autoAlpha: 1, duration: 0.65, ease: "sine.inOut" }, 7.75);
 
   // 4 段長度分配 (總長 753.98)
-  const donutSegments = [
-    { id: '#donut-seg-1', length: 263.89, rotation: -90 }, // 35%
-    { id: '#donut-seg-2', length: 226.19, rotation: 36 },  // 30%
-    { id: '#donut-seg-3', length: 150.80, rotation: 144 }, // 20%
-    { id: '#donut-seg-4', length: 113.10, rotation: 216 }  // 15%
-  ];
+  const donutSegments = chartMix.map((seg, index) => ({
+    id: `#donut-seg-${index + 1}`,
+    length: circ * (seg.donut / 100),
+    rotation: donutAngles[index].start - 90
+  }));
 
   donutSegments.forEach((seg, idx) => {
     masterTimeline.set(seg.id, { attr: { transform: `rotate(${seg.rotation})` }, strokeDashoffset: circ }, 7.5);
@@ -349,6 +466,18 @@ function buildTimeline() {
       ease: "power2.out"
     }, 8.0 + idx * 0.4);
   });
+  masterTimeline.fromTo('#donut-center-glow',
+    { opacity: 0, scale: 0.75 },
+    { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out", transformOrigin: "center center" },
+    8.15
+  );
+  masterTimeline.to('#donut-center-hud', {
+    opacity: 1,
+    scale: 1,
+    duration: 0.65,
+    ease: "back.out(1.4)",
+    transformOrigin: "center center"
+  }, 8.15);
 
   // 中心數字跳動到 100%
   const donutValueText = document.getElementById('donut-label-value');
@@ -375,35 +504,68 @@ function buildTimeline() {
     duration: 0.2 
   }, 10.0);
 
-  // 隱藏環狀圖
-  masterTimeline.to(donutGroup, { autoAlpha: 0, duration: 0.4 }, 10.0);
-  
-  // 顯示圓餅圖
-  masterTimeline.to(pieGroup, { autoAlpha: 1, duration: 0.4 }, 10.2);
+  // 將環形切片收孔並展開成實心圓餅圖
+  masterTimeline.set(pieGroup, { autoAlpha: 1 }, 9.95);
+  masterTimeline.to('.pie-orbit', {
+    opacity: 1,
+    scale: 1,
+    duration: 0.45,
+    ease: "power2.out"
+  }, 10.28);
+  masterTimeline.to('.pie-inner-glow', {
+    opacity: 1,
+    scale: 1,
+    duration: 0.45,
+    ease: "power2.out"
+  }, 10.45);
+  masterTimeline.to(donutGroup, {
+    autoAlpha: 0,
+    duration: 0.55,
+    ease: "power2.inOut"
+  }, 10.05);
 
-  // 繪製圓餅圖實心分段 (circPie = 376.99)
-  const pieSegs = [
-    { id: '#pie-seg-1', length: 150.8, rotation: -90 }, // 40%
-    { id: '#pie-seg-2', length: 113.1, rotation: 54 },  // 30%
-    { id: '#pie-seg-3', length: 75.4, rotation: 162 },  // 20%
-    { id: '#pie-seg-4', length: 37.7, rotation: 234 }   // 10%
-  ];
-
-  pieSegs.forEach((seg, idx) => {
-    masterTimeline.set(seg.id, { attr: { transform: `rotate(${seg.rotation})` }, strokeDashoffset: circPie }, 10.0);
-    masterTimeline.to(seg.id, {
-      strokeDashoffset: circPie - seg.length,
-      duration: 0.6,
-      ease: "power2.out"
-    }, 10.3 + idx * 0.3);
+  pieSliceIds.forEach((id, idx) => {
+    const donutAngle = donutAngles[idx];
+    const pieAngle = pieAngles[idx];
+    const labelPoint = getPieLabelPosition(pieAngle.mid);
+    masterTimeline.set(id, {
+      attr: { d: makeArcSlice(donutAngle.start, donutAngle.end, pieInnerStartRadius, pieOuterStartRadius, pieStartGapDeg) },
+      opacity: 0.42,
+      scale: 1
+    }, 9.95);
+    masterTimeline.to(id, {
+      opacity: 0.96,
+      duration: 0.35,
+      ease: "sine.inOut"
+    }, 10.0 + idx * 0.03);
+    masterTimeline.to(id, {
+      attr: { d: makeArcSlice(pieAngle.start, pieAngle.end, pieInnerEndRadius, pieOuterRadius, pieGapDeg) },
+      scale: 1,
+      duration: 0.95,
+      ease: "expo.inOut"
+    }, 10.1 + idx * 0.06);
+    masterTimeline.fromTo(pieLabelIds[idx],
+      {
+        opacity: 0,
+        scale: 0.68,
+        attr: { x: (labelPoint.x * 0.72).toFixed(1), y: (labelPoint.y * 0.72).toFixed(1) }
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        attr: { x: labelPoint.x.toFixed(1), y: labelPoint.y.toFixed(1) },
+        duration: 0.45,
+        ease: "back.out(1.6)"
+      },
+      10.95 + idx * 0.08
+    );
   });
-
-  // 標籤淡入
-  masterTimeline.fromTo('#pie-labels',
-    { opacity: 0, scale: 0.8 },
-    { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.2)" },
-    11.4
-  );
+  masterTimeline.to('.pie-center-pin', {
+    opacity: 1,
+    scale: 1,
+    duration: 0.4,
+    ease: "back.out(1.7)"
+  }, 10.85);
 
   // ==========================================
   // SCENE 7: 氣泡權重圖 (12.0s - 14.5s)
@@ -463,6 +625,13 @@ function buildTimeline() {
 
   // 隱藏氣泡圖
   masterTimeline.to(bubbleGroup, { autoAlpha: 0, duration: 0.4 }, 14.5);
+  masterTimeline.set(['#bubble-1', '#bubble-2', '#bubble-3', '#bubble-4', '#bubble-5'], {
+    x: 0,
+    y: 0,
+    opacity: 0,
+    scale: 0,
+    clearProps: "transform"
+  }, 14.9);
   
   // 顯示雷達圖
   masterTimeline.to(radarGroup, { autoAlpha: 1, duration: 0.4 }, 14.7);
@@ -471,6 +640,7 @@ function buildTimeline() {
   let radarData = { d0: 0, d1: 0, d2: 0, d3: 0, d4: 0 };
   const targetRadar = data.valuesB;
   const radarDots = radarDotsGroup.querySelectorAll('circle');
+  masterTimeline.set(radarDots, { opacity: 0, attr: { cx: 0, cy: 0, r: 3 }, clearProps: "transform" }, 14.5);
 
   masterTimeline.to(radarData, {
     d0: targetRadar[0],
@@ -488,18 +658,25 @@ function buildTimeline() {
       const p4 = `${-radarData.d4 * 133},${-radarData.d4 * 43}`;
       radarPolygon.setAttribute('points', `${p0} ${p1} ${p2} ${p3} ${p4}`);
 
-      radarDots[0].setAttribute('cx', 400);
-      radarDots[0].setAttribute('cy', 210 - radarData.d0 * 140);
-      radarDots[1].setAttribute('cx', 400 + radarData.d1 * 133);
-      radarDots[1].setAttribute('cy', 210 - radarData.d1 * 43);
-      radarDots[2].setAttribute('cx', 400 + radarData.d2 * 82);
-      radarDots[2].setAttribute('cy', 210 + radarData.d2 * 113);
-      radarDots[3].setAttribute('cx', 400 - radarData.d3 * 82);
-      radarDots[3].setAttribute('cy', 210 + radarData.d3 * 113);
-      radarDots[4].setAttribute('cx', 400 - radarData.d4 * 133);
-      radarDots[4].setAttribute('cy', 210 - radarData.d4 * 43);
+      radarDots[0].setAttribute('cx', 0);
+      radarDots[0].setAttribute('cy', -radarData.d0 * 140);
+      radarDots[1].setAttribute('cx', radarData.d1 * 133);
+      radarDots[1].setAttribute('cy', -radarData.d1 * 43);
+      radarDots[2].setAttribute('cx', radarData.d2 * 82);
+      radarDots[2].setAttribute('cy', radarData.d2 * 113);
+      radarDots[3].setAttribute('cx', -radarData.d3 * 82);
+      radarDots[3].setAttribute('cy', radarData.d3 * 113);
+      radarDots[4].setAttribute('cx', -radarData.d4 * 133);
+      radarDots[4].setAttribute('cy', -radarData.d4 * 43);
     }
   }, 14.8);
+  masterTimeline.to(radarDots, {
+    opacity: 1,
+    attr: { r: 5 },
+    duration: 0.55,
+    ease: "sine.out",
+    stagger: 0.08
+  }, 15.15);
 
   // ==========================================
   // SCENE 9: 波形折線圖 (16.5s - 19.0s)
@@ -517,12 +694,59 @@ function buildTimeline() {
   masterTimeline.to(waveformGroup, { autoAlpha: 1, duration: 0.4 }, 16.7);
 
   // 顯示左右發光錨定柱，做為熱流圖的邊界節點
-  masterTimeline.to(['#sankey-left-bar', '#sankey-right-bar'], { opacity: 0.8, duration: 0.4 }, 16.7);
+  masterTimeline.to(['#sankey-left-bar', '#sankey-right-bar'], { opacity: 0.45, duration: 0.5, ease: "sine.inOut" }, 16.7);
 
-  // 波動效果 (16.7s - 19.0s) 三條線同時作流暢波動，避免切換時第三條線突兀出現
-  masterTimeline.to('#wave-path-1', { attr: { d: wave1_B }, duration: 0.55, yoyo: true, repeat: 3, ease: "sine.inOut" }, 16.7);
-  masterTimeline.to('#wave-path-2', { attr: { d: wave2_B }, duration: 0.55, yoyo: true, repeat: 3, ease: "sine.inOut" }, 16.7);
-  masterTimeline.to('#wave-path-3', { attr: { d: wave3_B }, duration: 0.55, yoyo: true, repeat: 3, ease: "sine.inOut" }, 16.7);
+  // 先將訊號線畫入，再以多段趨勢路徑推進，形成向右流動的波形走勢。
+  masterTimeline.set('#wave-path-1', { attr: { d: wave1Trend[0] }, strokeDasharray: 900, strokeDashoffset: 900, strokeWidth: 4, opacity: 0.95 }, 16.55);
+  masterTimeline.set('#wave-path-2', { attr: { d: wave2Trend[0] }, strokeDasharray: 900, strokeDashoffset: 900, strokeWidth: 2.6, opacity: 0.56 }, 16.58);
+  masterTimeline.set('#wave-path-3', { attr: { d: wave3Trend[0] }, strokeDasharray: 900, strokeDashoffset: 900, strokeWidth: 1.8, opacity: 0.38 }, 16.6);
+  masterTimeline.to(['#wave-path-1', '#wave-path-2', '#wave-path-3'], {
+    strokeDashoffset: 0,
+    duration: 0.75,
+    ease: "power2.out",
+    stagger: 0.06
+  }, 16.72);
+
+  wave1Trend.slice(1).forEach((path, idx) => {
+    masterTimeline.to('#wave-path-1', {
+      attr: { d: path },
+      duration: 0.56,
+      ease: idx === 2 ? "power2.inOut" : "sine.inOut"
+    }, 17.15 + idx * 0.5);
+  });
+  wave2Trend.slice(1).forEach((path, idx) => {
+    masterTimeline.to('#wave-path-2', {
+      attr: { d: path },
+      duration: 0.62,
+      ease: "sine.inOut"
+    }, 17.02 + idx * 0.52);
+  });
+  wave3Trend.slice(1).forEach((path, idx) => {
+    masterTimeline.to('#wave-path-3', {
+      attr: { d: path },
+      duration: 0.58,
+      ease: "sine.inOut"
+    }, 17.08 + idx * 0.5);
+  });
+
+  const sampleTracks = [
+    { id: '#wave-sample-1', points: [[110,226], [300,196], [468,145], [642,118], [700,120]] },
+    { id: '#wave-sample-2', points: [[112,218], [310,206], [490,223], [612,224], [700,202]] },
+    { id: '#wave-sample-3', points: [[110,208], [320,212], [530,194], [650,202], [700,199]] }
+  ];
+  sampleTracks.forEach((track, trackIndex) => {
+    const firstPoint = track.points[0];
+    masterTimeline.set(track.id, { opacity: 0, attr: { cx: firstPoint[0], cy: firstPoint[1] } }, 16.65);
+    masterTimeline.to(track.id, { opacity: trackIndex === 0 ? 1 : 0.65, duration: 0.25, ease: "sine.out" }, 16.85 + trackIndex * 0.08);
+    track.points.slice(1).forEach((point, pointIndex) => {
+      masterTimeline.to(track.id, {
+        attr: { cx: point[0], cy: point[1] },
+        duration: 0.42,
+        ease: "power1.inOut"
+      }, 17.05 + pointIndex * 0.42 + trackIndex * 0.08);
+    });
+    masterTimeline.to(track.id, { opacity: 0, duration: 0.3, ease: "sine.in" }, 18.8 + trackIndex * 0.04);
+  });
 
   // ==========================================
   // SCENE 10: 桑基熱流圖 (19.0s - 21.5s) - 完美平滑 Morph，絕不斷線！
@@ -539,7 +763,7 @@ function buildTimeline() {
   const sankey3 = "M 100,300 C 250,300 250,210 400,210 C 550,210 550,180 700,180";
 
   // 在變形開始時，將線條端點改為平切 (butt)，以完美貼合垂直錨定柱
-  masterTimeline.set(['#wave-path-1', '#wave-path-2', '#wave-path-3'], { strokeLinecap: "butt" }, 19.1);
+  masterTimeline.set(['#wave-path-1', '#wave-path-2', '#wave-path-3'], { strokeLinecap: "butt", strokeDasharray: "none", strokeDashoffset: 0 }, 19.1);
 
   // 波形路徑 1 變形成為 桑基上分流 (加粗為 24px)
   masterTimeline.to('#wave-path-1', {

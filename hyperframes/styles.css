@@ -845,13 +845,117 @@ body.playing .status-indicator {
   stroke-dashoffset: 0;
 }
 
-.dot-node {
-  cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+#donut-chart-group,
+#pie-chart-group,
+#pie-slices,
+#pie-labels {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-.dot-node:hover {
-  transform: scale(1.3);
+#donut-center-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+#donut-center-hud {
+  transform-box: fill-box;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+#donut-value-card {
+  fill: rgba(8, 17, 28, 0.72);
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1.2;
+  filter: drop-shadow(0 0 18px rgba(56, 232, 255, 0.22));
+}
+
+.donut-value-scan {
+  stroke: rgba(56, 232, 255, 0.42);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+#donut-label-value {
+  dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: rgba(5, 10, 18, 0.65);
+  stroke-width: 4;
+  letter-spacing: 0;
+}
+
+#donut-label-title {
+  dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: rgba(5, 10, 18, 0.72);
+  stroke-width: 3;
+}
+
+.pie-orbit {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 7;
+}
+
+.pie-inner-glow {
+  fill: rgba(56, 232, 255, 0.08);
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 1;
+}
+
+.pie-slice {
+  stroke: rgba(5, 10, 20, 0.9);
+  stroke-width: 2.5;
+  paint-order: stroke fill;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+#pie-slice-1 {
+  fill: color-mix(in srgb, var(--theme-primary) 90%, white 10%);
+}
+
+#pie-slice-2 {
+  fill: color-mix(in srgb, var(--theme-secondary) 82%, #ff6f7d 18%);
+}
+
+#pie-slice-3 {
+  fill: color-mix(in srgb, var(--theme-accent) 88%, white 12%);
+}
+
+#pie-slice-4 {
+  fill: rgba(163, 112, 247, 0.92);
+}
+
+.pie-center-pin {
+  fill: #ffffff;
+  stroke: rgba(56, 232, 255, 0.75);
+  stroke-width: 3;
+}
+
+#pie-labels text {
+  dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: rgba(4, 8, 18, 0.72);
+  stroke-width: 4;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.dot-node {
+  pointer-events: none;
+}
+
+#wave-sample-points {
+  pointer-events: none;
+}
+
+#wave-sample-points circle {
+  opacity: 0;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 1.6;
 }
 
 /* 數字跳動動畫 */
@@ -884,4 +988,3 @@ body.playing .status-indicator {
 .flow-node {
   transform-origin: 0 0;
 }
-
