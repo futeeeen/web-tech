@@ -269,7 +269,6 @@ function buildTimeline() {
   gsap.set('#wave-path-2', { attr: { d: wave2_A }, strokeWidth: 2.5, opacity: 0.7, strokeLinecap: "round" });
   gsap.set('#wave-path-3', { attr: { d: wave3_A }, strokeWidth: 1.5, opacity: 0.4, strokeLinecap: "round" });
   gsap.set(['#wave-path-1', '#wave-path-2', '#wave-path-3'], { strokeDasharray: 900, strokeDashoffset: 900 });
-  gsap.set('#wave-sample-points circle', { opacity: 0, attr: { cx: 100, cy: 210, r: (i) => [5, 4, 3.5][i] } });
   gsap.set(['#sankey-left-bar', '#sankey-right-bar'], { opacity: 0 });
 
   // 預先建立折線圖的點
@@ -727,25 +726,6 @@ function buildTimeline() {
       duration: 0.58,
       ease: "sine.inOut"
     }, 17.08 + idx * 0.5);
-  });
-
-  const sampleTracks = [
-    { id: '#wave-sample-1', points: [[110,226], [300,196], [468,145], [642,118], [700,120]] },
-    { id: '#wave-sample-2', points: [[112,218], [310,206], [490,223], [612,224], [700,202]] },
-    { id: '#wave-sample-3', points: [[110,208], [320,212], [530,194], [650,202], [700,199]] }
-  ];
-  sampleTracks.forEach((track, trackIndex) => {
-    const firstPoint = track.points[0];
-    masterTimeline.set(track.id, { opacity: 0, attr: { cx: firstPoint[0], cy: firstPoint[1] } }, 16.65);
-    masterTimeline.to(track.id, { opacity: trackIndex === 0 ? 1 : 0.65, duration: 0.25, ease: "sine.out" }, 16.85 + trackIndex * 0.08);
-    track.points.slice(1).forEach((point, pointIndex) => {
-      masterTimeline.to(track.id, {
-        attr: { cx: point[0], cy: point[1] },
-        duration: 0.42,
-        ease: "power1.inOut"
-      }, 17.05 + pointIndex * 0.42 + trackIndex * 0.08);
-    });
-    masterTimeline.to(track.id, { opacity: 0, duration: 0.3, ease: "sine.in" }, 18.8 + trackIndex * 0.04);
   });
 
   // ==========================================
